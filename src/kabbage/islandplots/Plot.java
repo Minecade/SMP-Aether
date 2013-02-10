@@ -12,11 +12,11 @@ public class Plot implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
 	private static final int VERSION = 1;
-	public static int plotSize = 100;
 	
 	String world;
 	private String owner;
 	private List<String> members;
+	private int plotSize = 100;
 	private int x;
 	private int y;
 	private Island island;

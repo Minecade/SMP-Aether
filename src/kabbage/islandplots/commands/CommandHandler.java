@@ -22,6 +22,11 @@ public class CommandHandler
 		senderWrapper = new CommandSenderWrapper(sender);
 		this.command = command;
 	}
+	
+	public void createPlot()
+	{
+		
+	}
 
 	public void teleportHome()
 	{

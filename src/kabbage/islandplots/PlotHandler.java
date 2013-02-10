@@ -24,6 +24,14 @@ public class PlotHandler implements Externalizable
 	private int currentRing;
 	private List<Coordinate> openPlots;	//List of plots opened up after having been removed
 	
+	/**
+	 * Empty constructor for externalization
+	 */
+	public PlotHandler()
+	{
+		
+	}
+	
 	public PlotHandler(String world)
 	{
 		this.world = world;

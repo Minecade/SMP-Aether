@@ -23,6 +23,9 @@ public class IslandPlotCommands implements CommandExecutor
 			case "home":
 				handler.teleportHome();
 				break;
+			case "new": case "create":
+				handler.createPlot();
+				break;
 			default:
 				hardFailure = true;
 			}
