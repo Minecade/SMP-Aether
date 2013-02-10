@@ -20,8 +20,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.google.common.io.Files;
-
 public class IslandPlots extends JavaPlugin
 {
 	public static IslandPlots instance;
@@ -54,12 +52,14 @@ public class IslandPlots extends JavaPlugin
 		pListener.registerEvents(pm, this);
 		wListener.registerEvents(pm, this);
 		bListener.registerEvents(pm, this);
+		
+		loadPlotHandler();
 	}
 
 	@Override
 	public void onDisable()
 	{
-		
+		savePlotHandler();
 	}
 	
 	public PlotHandler getPlotHandler()
@@ -84,13 +84,14 @@ public class IslandPlots extends JavaPlugin
 
         } catch (Exception e)
         {
-        	logger.log(Level.WARNING, "Couldn't load the PlotHandler database. Ignore if this is the first time the plugin has been run.");
-        	plotHandler = new PlotHandler();
+        	logger.log(Level.WARNING, "Couldn't load the PlotHandler database. Ignore if the island world has not yet been created.");
         }
 	}
 	
 	private void savePlotHandler()
 	{
+		if(plotHandler == null)
+			return;
 		File path = new File(Constants.PLOT_PATH);
 
 		try

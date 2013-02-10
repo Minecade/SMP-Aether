@@ -23,9 +23,22 @@ public class CommandHandler
 		this.command = command;
 	}
 	
+	public void createIslandWorld()
+	{
+		if(!senderWrapper.isAdmin())
+			senderWrapper.sendMessage(ChatColor.RED+"You do not have permission to do this.");
+		
+	}
+	
 	public void createPlot()
 	{
-		
+		String playerName = senderWrapper.getPlayer().getName();
+		if(!PlayerWrapper.getWrapper(playerName).canHavePlot())
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You are not allowed to have another plot.");
+			return;
+		}
+		PlayerWrapper.getWrapper(playerName).addPlot(plugin.getPlotHandler().appendPlot(playerName));
 	}
 
 	public void teleportHome()

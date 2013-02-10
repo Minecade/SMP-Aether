@@ -34,8 +34,14 @@ public class PlayerWrapper implements Externalizable
 		this(player.getName());
 	}
 	
-	public boolean addPlot()
+	public void addPlot(Plot plot)
 	{
+		plotsOwned.add(plot);
+	}
+	
+	public boolean canHavePlot()
+	{
+		//TODO
 		return true;
 	}
 	
@@ -58,7 +64,9 @@ public class PlayerWrapper implements Externalizable
 	
 	public static PlayerWrapper getWrapper(String player)
 	{
-		return players.get(player);
+		PlayerWrapper wrapper = players.get(player);
+		if(wrapper == null) wrapper = new PlayerWrapper(player);
+		return wrapper;
 	}
 	
 	public static PlayerWrapper getWrapper(Player player)
