@@ -1,0 +1,5 @@
+name: IslandPlots
+main: kabbage.islandplots.IslandPlots
+author: kabbage
+version: 0.1
+commands:
