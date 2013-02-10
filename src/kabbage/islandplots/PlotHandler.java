@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import kabbage.islandplots.utils.Coordinate;
+
 import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
 
@@ -20,6 +22,7 @@ public class PlotHandler implements Externalizable
 	private String world;
 	private Table<Integer, Integer, Plot> plotGrid;
 	private int currentRing;
+	private List<Coordinate> openPlots;	//List of plots opened up after having been removed
 	
 	public PlotHandler(String world)
 	{
@@ -31,16 +34,22 @@ public class PlotHandler implements Externalizable
 	/**
 	 * Creates a new plot in a random unoccupied position in the outermost unfilled ring of the giant grid of plots
 	 * @param owner	owner of the soon to be plot
-	 * @return		the created plot
+	 * @return	the created plot
 	 */
 	public Plot appendPlot(String owner)
 	{
-		for(Entry<Integer, Integer> coord : getRingOfPlotPositions())
+		if(!openPlots.isEmpty())
 		{
-			if(!plotGrid.contains(coord.getKey(), coord.getValue()))
+			Coordinate coord = openPlots.remove(0);
+			Plot plot = new Plot(owner, coord);
+			return plotGrid.put(coord.x, coord.y, plot);
+		}
+		for(Coordinate coord : getRingOfPlotPositions())
+		{
+			if(!plotGrid.contains(coord.x, coord.y))
 			{
-				Plot plot = new Plot(owner, coord.getKey(), coord.getValue());
-				return plotGrid.put(coord.getKey(), coord.getValue(), plot);
+				Plot plot = new Plot(owner, coord.x, coord.y);
+				return plotGrid.put(coord.x, coord.y, plot);
 			}
 		}
 		// All of the plots in the current ring must be filled. Go to the next ring and try again
@@ -48,22 +57,28 @@ public class PlotHandler implements Externalizable
 		return appendPlot(owner);
 	}
 	
+	public void removePlot(Plot plot)
+	{
+		openPlots.add(plot.getLocation());
+		plotGrid.remove(plot.getX(), plot.getY());
+	}
+	
 	/**
 	 * Gets the coordinates of the plots that occupy the outermost unfilled ring of the grid
 	 * @return	map of coordinates
 	 */
-	private List<Entry<Integer, Integer>> getRingOfPlotPositions()
+	private List<Coordinate> getRingOfPlotPositions()
 	{
-		List<Entry<Integer, Integer>> ring = new ArrayList<>();
+		List<Coordinate> ring = new ArrayList<>();
 		for(int x = -currentRing; x <= currentRing; x++)
 		{
-			ring.add(new AbstractMap.SimpleEntry<>(x, currentRing));
-			ring.add(new AbstractMap.SimpleEntry<>(x, -currentRing));
+			ring.add(new Coordinate(x, currentRing));
+			ring.add(new Coordinate(x, -currentRing));
 		}
 		for(int y = -currentRing; y <= currentRing; y++)
 		{
-			ring.add(new AbstractMap.SimpleEntry<>(currentRing, y));
-			ring.add(new AbstractMap.SimpleEntry<>(-currentRing, y));
+			ring.add(new Coordinate(currentRing, y));
+			ring.add(new Coordinate(-currentRing, y));
 		}
 		return ring;
 	}

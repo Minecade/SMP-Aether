@@ -6,6 +6,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
 
+import kabbage.islandplots.utils.Coordinate;
+
 public class Plot implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
@@ -14,16 +16,36 @@ public class Plot implements Externalizable
 	
 	private String owner;
 	private List<String> members;
-	private double x;
-	private double z;
+	private int x;
+	private int y;
 	
-	public Plot(String owner, double centerX, double centerZ)
+	public Plot(String owner, int centerX, int centerY)
 	{
 		this.owner = owner;
 		x = centerX;
-		z = centerZ;
+		y = centerY;
 		
-		new Island(x, 80, z).generate();
+		new Island(x, 80, y).generate();
+	}
+	
+	public Plot(String owner, Coordinate coord)
+	{
+		this(owner, coord.x, coord.y);
+	}
+	
+	public Coordinate getLocation()
+	{
+		return new Coordinate(x, y);
+	}
+	
+	public int getX()
+	{
+		return x;
+	}
+	
+	public int getY()
+	{
+		return y;
 	}
 	
 	@Override
