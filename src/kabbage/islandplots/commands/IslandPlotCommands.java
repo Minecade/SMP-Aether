@@ -20,7 +20,9 @@ public class IslandPlotCommands implements CommandExecutor
 		{
 			switch(command.get(1).toLowerCase())
 			{
-			
+			case "home":
+				handler.teleportHome();
+				break;
 			default:
 				hardFailure = true;
 			}

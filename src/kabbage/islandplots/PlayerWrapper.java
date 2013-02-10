@@ -38,6 +38,11 @@ public class PlayerWrapper implements Externalizable
 	{
 		return true;
 	}
+	
+	public Plot getPlot(int index)
+	{
+		return plotsOwned.get(index);
+	}
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException

@@ -14,38 +14,81 @@ public class Plot implements Externalizable
 	private static final int VERSION = 1;
 	public static int plotSize = 100;
 	
+	String world;
 	private String owner;
 	private List<String> members;
 	private int x;
 	private int y;
+	private Island island;
 	
-	public Plot(String owner, int centerX, int centerY)
+	public Plot(String world, String owner, int centerX, int centerY)
 	{
+		this.world = world;
 		this.owner = owner;
 		x = centerX;
 		y = centerY;
 		
-		new Island(x, 80, y).generate();
+		island = new Island(world, getX(), 80, y * getZ());
+		island.generate();
 	}
 	
-	public Plot(String owner, Coordinate coord)
+	public Plot(String world, String owner, Coordinate coord)
 	{
-		this(owner, coord.x, coord.y);
+		this(world, owner, coord.x, coord.y);
 	}
 	
-	public Coordinate getLocation()
+	/**
+	 * Gets the plots coordinates on the plot grid
+	 * @return	coord
+	 */
+	public Coordinate getGridLocation()
 	{
 		return new Coordinate(x, y);
 	}
 	
-	public int getX()
+	/**
+	 * Gets the plots position on the x axis on the plot grid
+	 * @return	x
+	 */
+	public int getGridX()
 	{
 		return x;
 	}
 	
-	public int getY()
+	/**
+	 * Gets the plots position on the y axis on the plot grid
+	 * @return	y
+	 */
+	public int getGridY()
 	{
 		return y;
+	}
+	
+	/**
+	 * Gets the x coordinate the plots center lies in, in the world
+	 * @return	z
+	 */
+	public int getX()
+	{
+		return x * plotSize;
+	}
+	
+	/**
+	 * Gets the z coordinate the plots center lies in, in the world
+	 * @return	z
+	 */
+	public int getZ()
+	{
+		return y * plotSize;
+	}
+	
+	/**
+	 * Get the island occupying the plot
+	 * @return	island
+	 */
+	public Island getIsland()
+	{
+		return island;
 	}
 	
 	@Override

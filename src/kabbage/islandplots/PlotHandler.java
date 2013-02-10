@@ -41,14 +41,14 @@ public class PlotHandler implements Externalizable
 		if(!openPlots.isEmpty())
 		{
 			Coordinate coord = openPlots.remove(0);
-			Plot plot = new Plot(owner, coord);
+			Plot plot = new Plot(world, owner, coord);
 			return plotGrid.put(coord.x, coord.y, plot);
 		}
 		for(Coordinate coord : getRingOfPlotPositions())
 		{
 			if(!plotGrid.contains(coord.x, coord.y))
 			{
-				Plot plot = new Plot(owner, coord.x, coord.y);
+				Plot plot = new Plot(world, owner, coord.x, coord.y);
 				return plotGrid.put(coord.x, coord.y, plot);
 			}
 		}
@@ -59,8 +59,8 @@ public class PlotHandler implements Externalizable
 	
 	public void removePlot(Plot plot)
 	{
-		openPlots.add(plot.getLocation());
-		plotGrid.remove(plot.getX(), plot.getY());
+		openPlots.add(plot.getGridLocation());
+		plotGrid.remove(plot.getGridX(), plot.getGridX());
 	}
 	
 	/**
