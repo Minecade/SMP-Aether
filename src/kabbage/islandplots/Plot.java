@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
+import java.util.logging.Level;
 
 import kabbage.islandplots.generation.Island;
 import kabbage.islandplots.utils.Coordinate;
@@ -92,15 +93,37 @@ public class Plot implements Externalizable
 		return island;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
 	{
-		
+		int ver = in.readInt();
+		if(ver == 1)
+		{
+			world = in.readUTF();
+			owner = in.readUTF();
+			members = (List<String>) in.readObject();
+			plotSize = in.readInt();
+			x = in.readInt();
+			y = in.readInt();
+			island = (Island) in.readObject();
+		} else
+		{
+			IslandPlots.logger.log(Level.WARNING, "Unsupported version of a Plot failed to load.");
+		}
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException
 	{
+		out.writeInt(VERSION);
 		
+		out.writeUTF(world);
+		out.writeUTF(owner);
+		out.writeObject(members);
+		out.writeInt(plotSize);
+		out.writeInt(x);
+		out.writeInt(y);
+		out.writeObject(island);
 	}
 }

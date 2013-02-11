@@ -29,8 +29,8 @@ public class CommandHandler
 	{
 		if(!senderWrapper.isAdmin())
 			senderWrapper.sendMessage(ChatColor.RED+"You do not have permission to do this.");
-		Bukkit.dispatchCommand(senderWrapper.getSender(), "mv create IslandWorld normal -g NullTerrain");
-		plugin.setPlotHandler(new PlotHandler("IslandWorld"));
+		Bukkit.dispatchCommand(senderWrapper.getSender(), "mv create "+worldName+" normal -g NullTerrain");
+		plugin.setPlotHandler(new PlotHandler(worldName));
 	}
 	
 	public void createPlot()

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 
@@ -16,7 +17,7 @@ public class PlayerWrapper implements Externalizable
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
 	private static final int VERSION = 1;
 	
-	private static Map<String, PlayerWrapper> players = new HashMap<String, PlayerWrapper>();
+	static Map<String, PlayerWrapper> players = new HashMap<String, PlayerWrapper>();
 	
 	private String playerName;
 	private List<Plot> plotsOwned;
@@ -49,18 +50,6 @@ public class PlayerWrapper implements Externalizable
 	{
 		return plotsOwned.get(index);
 	}
-
-	@Override
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
-	{
-		
-	}
-
-	@Override
-	public void writeExternal(ObjectOutput out) throws IOException
-	{
-		
-	}
 	
 	public static PlayerWrapper getWrapper(String player)
 	{
@@ -72,5 +61,29 @@ public class PlayerWrapper implements Externalizable
 	public static PlayerWrapper getWrapper(Player player)
 	{
 		return getWrapper(player.getName());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
+	{
+		int ver = in.readInt();
+		if(ver == 1)
+		{
+			playerName = in.readUTF();
+			plotsOwned = (List<Plot>) in.readObject();
+		} else
+		{
+			IslandPlots.logger.log(Level.WARNING, "Unsupported version of an Island failed to load.");
+		}
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException
+	{
+		out.writeInt(VERSION);
+		
+		out.writeUTF(playerName);
+		out.writeObject(plotsOwned);
 	}
 }

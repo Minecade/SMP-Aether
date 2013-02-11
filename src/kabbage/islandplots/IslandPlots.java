@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,7 +31,7 @@ public class IslandPlots extends JavaPlugin
 	
 	private PlotHandler plotHandler;
 	
-	private final IslandPlotCommands ipCommands = new IslandPlotCommands();
+	private IslandPlotCommands ipCommands;
 	//Listeners
 	private EntityListener eListener;
 	private PlayerListener pListener;
@@ -43,6 +44,7 @@ public class IslandPlots extends JavaPlugin
 		instance = this;
 		logger = getLogger();
 		
+		ipCommands = new IslandPlotCommands();
 		getCommand("island").setExecutor(ipCommands);
 		
 		PluginManager pm = Bukkit.getPluginManager();
@@ -57,13 +59,20 @@ public class IslandPlots extends JavaPlugin
 		wListener.registerEvents(pm, this);
 		bListener.registerEvents(pm, this);
 		
+		loadPlayerWrappers();
 		loadPlotHandler();
 	}
 
 	@Override
 	public void onDisable()
 	{
+		savePlayerWrappers();
 		savePlotHandler();
+	}
+	
+	public MultiverseCore getMultiverse()
+	{
+		return multiverse;
 	}
 	
 	public PlotHandler getPlotHandler()
@@ -71,14 +80,25 @@ public class IslandPlots extends JavaPlugin
 		return plotHandler;
 	}
 	
-	public void setPlotHandler(PlotHandler plotHandler)
+	@SuppressWarnings("unchecked")
+	private void loadPlayerWrappers()
 	{
-		this.plotHandler = plotHandler;
-	}
-	
-	public MultiverseCore getMultiverse()
-	{
-		return multiverse;
+		File path = new File(Constants.PLAYERS_PATH);
+
+        try
+        {
+        	FileInputStream fis = new FileInputStream(path);
+        	ObjectInputStream ois = new ObjectInputStream(fis);
+
+        	PlayerWrapper.players = (Map<String, PlayerWrapper>) ois.readObject();
+
+            ois.close();
+            fis.close();
+
+        } catch (Exception e)
+        {
+        	logger.log(Level.WARNING, "Couldn't load the PlotHandler database. Ignore if the island world has not yet been created.");
+        }
 	}
 	
 	private void loadPlotHandler()
@@ -102,12 +122,34 @@ public class IslandPlots extends JavaPlugin
         }
 	}
 	
+	private void savePlayerWrappers()
+	{
+		File path = new File(Constants.PLAYERS_PATH);
+		path.mkdirs();
+		
+		try
+		{
+			FileOutputStream fos = new FileOutputStream(path);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+            oos.writeObject(PlayerWrapper.players);
+
+            oos.close();
+            fos.close();
+
+        } catch (IOException e)
+        {
+        	logger.log(Level.WARNING, "Error saving the PlotHandler database.");
+        }
+	}
+	
 	private void savePlotHandler()
 	{
 		if(plotHandler == null)
 			return;
 		File path = new File(Constants.PLOT_PATH);
-
+		path.mkdirs();
+		
 		try
 		{
 			FileOutputStream fos = new FileOutputStream(path);
@@ -122,5 +164,10 @@ public class IslandPlots extends JavaPlugin
         {
         	logger.log(Level.WARNING, "Error saving the PlotHandler database.");
         }
+	}
+	
+	public void setPlotHandler(PlotHandler plotHandler)
+	{
+		this.plotHandler = plotHandler;
 	}
 }

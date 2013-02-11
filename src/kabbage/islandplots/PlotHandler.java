@@ -4,10 +4,9 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.logging.Level;
 
 import kabbage.islandplots.utils.Coordinate;
 
@@ -37,6 +36,7 @@ public class PlotHandler implements Externalizable
 		this.world = world;
 		plotGrid = TreeBasedTable.create();
 		currentRing = 0;
+		openPlots = new ArrayList<Coordinate>();
 	}
 	
 	/**
@@ -98,15 +98,31 @@ public class PlotHandler implements Externalizable
 		return ring;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
 	{
-		
+		int ver = in.readInt();
+		if(ver == 1)
+		{
+			world = in.readUTF();
+			currentRing = in.readInt();
+			plotGrid = (Table<Integer, Integer, Plot>) in.readObject();
+			openPlots = (List<Coordinate>) in.readObject();
+		} else
+		{
+			IslandPlots.logger.log(Level.WARNING, "Unsupported version of the PlotHandler failed to load.");
+		}
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException
 	{
+		out.writeInt(VERSION);
 		
+		out.writeUTF(world);
+		out.writeInt(currentRing);
+		out.writeObject(plotGrid);
+		out.writeObject(openPlots);
 	}
 }
