@@ -3,8 +3,10 @@ package kabbage.islandplots.commands;
 import kabbage.islandplots.IslandPlots;
 import kabbage.islandplots.PlayerWrapper;
 import kabbage.islandplots.Plot;
+import kabbage.islandplots.PlotHandler;
 import kabbage.islandplots.utils.Utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,11 +25,12 @@ public class CommandHandler
 		this.command = command;
 	}
 	
-	public void createIslandWorld()
+	public void createIslandWorld(String worldName)
 	{
 		if(!senderWrapper.isAdmin())
 			senderWrapper.sendMessage(ChatColor.RED+"You do not have permission to do this.");
-		
+		Bukkit.dispatchCommand(senderWrapper.getSender(), "mv create IslandWorld normal -g NullTerrain");
+		plugin.setPlotHandler(new PlotHandler("IslandWorld"));
 	}
 	
 	public void createPlot()
@@ -38,7 +41,8 @@ public class CommandHandler
 			senderWrapper.sendMessage(ChatColor.RED+"You are not allowed to have another plot.");
 			return;
 		}
-		PlayerWrapper.getWrapper(playerName).addPlot(plugin.getPlotHandler().appendPlot(playerName));
+		Plot plot = plugin.getPlotHandler().appendPlot(playerName);
+		senderWrapper.getPlayer().teleport(plot.getIsland().getSpawnPoint());
 	}
 
 	public void teleportHome()

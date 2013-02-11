@@ -41,7 +41,7 @@ public class IslandPlotCommands implements CommandExecutor
 				handler.createPlot();
 				break;
 			case "setworld":
-				handler.createIslandWorld();
+				handler.createIslandWorld(command.get(2));
 				break;
 			default:
 				hardFailure = true;

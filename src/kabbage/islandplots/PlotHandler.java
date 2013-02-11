@@ -40,25 +40,32 @@ public class PlotHandler implements Externalizable
 	}
 	
 	/**
-	 * Creates a new plot in a random unoccupied position in the outermost unfilled ring of the giant grid of plots
+	 * Creates a new plot in a random unoccupied position in the outermost unfilled ring of the giant grid of plots.
+	 * The method automatically adds the new plot to the list of owned plots of the owner.
 	 * @param owner	owner of the soon to be plot
 	 * @return	the created plot
 	 */
 	public Plot appendPlot(String owner)
 	{
+		Plot plot = null;
 		if(!openPlots.isEmpty())
 		{
 			Coordinate coord = openPlots.remove(0);
-			Plot plot = new Plot(world, owner, coord);
-			return plotGrid.put(coord.x, coord.y, plot);
+			plot = new Plot(world, owner, coord);
+			plotGrid.put(coord.x, coord.y, plot);
 		}
 		for(Coordinate coord : getRingOfPlotPositions())
 		{
 			if(!plotGrid.contains(coord.x, coord.y))
 			{
-				Plot plot = new Plot(world, owner, coord.x, coord.y);
-				return plotGrid.put(coord.x, coord.y, plot);
+				plot = new Plot(world, owner, coord.x, coord.y);
+				plotGrid.put(coord.x, coord.y, plot);
 			}
+		}
+		if(plot != null)
+		{
+			PlayerWrapper.getWrapper(owner).addPlot(plot);
+			return plot;
 		}
 		// All of the plots in the current ring must be filled. Go to the next ring and try again
 		currentRing++;

@@ -6,6 +6,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
 
+import kabbage.islandplots.generation.Island;
 import kabbage.islandplots.utils.Coordinate;
 
 public class Plot implements Externalizable

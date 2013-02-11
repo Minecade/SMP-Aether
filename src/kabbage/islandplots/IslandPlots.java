@@ -20,10 +20,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.onarandombox.MultiverseCore.MultiverseCore;
+
 public class IslandPlots extends JavaPlugin
 {
 	public static IslandPlots instance;
 	public static Logger logger;
+	private MultiverseCore multiverse;
 	
 	private PlotHandler plotHandler;
 	
@@ -43,6 +46,7 @@ public class IslandPlots extends JavaPlugin
 		getCommand("island").setExecutor(ipCommands);
 		
 		PluginManager pm = Bukkit.getPluginManager();
+		multiverse = (MultiverseCore) pm.getPlugin("MultiverseCore");
 		//Register listeners
 		eListener = new EntityListener();
 		pListener = new PlayerListener();
@@ -65,6 +69,16 @@ public class IslandPlots extends JavaPlugin
 	public PlotHandler getPlotHandler()
 	{
 		return plotHandler;
+	}
+	
+	public void setPlotHandler(PlotHandler plotHandler)
+	{
+		this.plotHandler = plotHandler;
+	}
+	
+	public MultiverseCore getMultiverse()
+	{
+		return multiverse;
 	}
 	
 	private void loadPlotHandler()
