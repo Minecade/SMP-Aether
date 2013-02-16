@@ -23,14 +23,14 @@ public class Plot implements Externalizable
 	private int y;
 	private Island island;
 	
-	public Plot(String world, String owner, int centerX, int centerY)
+	public Plot(String world, String owner, int gridX, int gridY)
 	{
 		this.world = world;
 		this.owner = owner;
-		x = centerX;
-		y = centerY;
+		x = gridX;
+		y = gridY;
 		
-		island = new Island(world, getX(), 80, y * getZ());
+		island = new Island(world, getX(), 80, getZ());
 		island.generate();
 	}
 	

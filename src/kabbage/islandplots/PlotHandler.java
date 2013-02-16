@@ -60,6 +60,7 @@ public class PlotHandler implements Externalizable
 			{
 				plot = new Plot(world, owner, coord.x, coord.y);
 				plotGrid.put(coord.x, coord.y, plot);
+				break;
 			}
 		}
 		if(plot != null)
@@ -95,6 +96,7 @@ public class PlotHandler implements Externalizable
 			ring.add(new Coordinate(currentRing, y));
 			ring.add(new Coordinate(-currentRing, y));
 		}
+		IslandPlots.logger.log(Level.INFO, ring.toString());
 		return ring;
 	}
 	

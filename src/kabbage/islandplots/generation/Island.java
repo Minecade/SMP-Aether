@@ -32,11 +32,11 @@ public class Island implements Externalizable
 	
 	public void generate()
 	{
-		for(int i = x - 35; i < x + 35; i++)
+		for(int i = x - 15; i < x + 15; i++)
 		{
-			for(int j = y - 35; j < y + 35; j++)
+			for(int j = y - 15; j < y + 15; j++)
 			{
-				for(int k = y - 35; k < y + 35; k++)
+				for(int k = z - 15; k < z + 15; k++)
 				{
 					Bukkit.getWorld(world).getBlockAt(i, j, k).setType(Material.STONE);
 				}

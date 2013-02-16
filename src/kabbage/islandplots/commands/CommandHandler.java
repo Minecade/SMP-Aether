@@ -49,8 +49,8 @@ public class CommandHandler
 	{
 		int homeID = (command.hasArgAtIndex(2)) ? Utils.parseInt(command.getArgAtIndex(2), 1) : 1;
 		Player player = senderWrapper.getPlayer();
-		PlayerWrapper playerW = new PlayerWrapper(senderWrapper.getPlayer());
-		Plot plot = playerW.getPlot(homeID);
+		PlayerWrapper playerW = PlayerWrapper.getWrapper(senderWrapper.getPlayer());
+		Plot plot = playerW.getPlot(homeID - 1);
 		if(plot == null)
 		{
 			senderWrapper.sendMessage(ChatColor.RED+"Specified plot could not be found.");

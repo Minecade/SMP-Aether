@@ -22,7 +22,7 @@ public class PlayerWrapper implements Externalizable
 	private String playerName;
 	private List<Plot> plotsOwned;
 	
-	public PlayerWrapper(String playerName)
+	private PlayerWrapper(String playerName)
 	{
 		this.playerName = playerName;
 		plotsOwned = new ArrayList<Plot>();
@@ -48,6 +48,8 @@ public class PlayerWrapper implements Externalizable
 	
 	public Plot getPlot(int index)
 	{
+		if(plotsOwned.size() < index)
+			return null;
 		return plotsOwned.get(index);
 	}
 	

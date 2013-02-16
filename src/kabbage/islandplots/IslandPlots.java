@@ -97,7 +97,7 @@ public class IslandPlots extends JavaPlugin
 
         } catch (Exception e)
         {
-        	logger.log(Level.WARNING, "Couldn't load the PlotHandler database. Ignore if the island world has not yet been created.");
+        	logger.log(Level.WARNING, "Couldn't load the PlayerWrapper database. Ignore if the island world has not yet been created.");
         }
 	}
 	
@@ -125,7 +125,7 @@ public class IslandPlots extends JavaPlugin
 	private void savePlayerWrappers()
 	{
 		File path = new File(Constants.PLAYERS_PATH);
-		path.mkdirs();
+		new File(Constants.PLUGIN_PATH).mkdir();
 		
 		try
 		{
@@ -139,7 +139,7 @@ public class IslandPlots extends JavaPlugin
 
         } catch (IOException e)
         {
-        	logger.log(Level.WARNING, "Error saving the PlotHandler database.");
+        	logger.log(Level.WARNING, "Error saving the PlayerWrapper database.");
         }
 	}
 	
@@ -148,7 +148,7 @@ public class IslandPlots extends JavaPlugin
 		if(plotHandler == null)
 			return;
 		File path = new File(Constants.PLOT_PATH);
-		path.mkdirs();
+		new File(Constants.PLUGIN_PATH).mkdir();
 		
 		try
 		{
