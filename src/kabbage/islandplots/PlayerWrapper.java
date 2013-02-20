@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class PlayerWrapper implements Externalizable
@@ -46,11 +47,21 @@ public class PlayerWrapper implements Externalizable
 		return true;
 	}
 	
+	public Player getPlayer()
+	{
+		return Bukkit.getPlayer(playerName);
+	}
+	
 	public Plot getPlot(int index)
 	{
-		if(plotsOwned.size() < index)
+		if(index >= plotsOwned.size() || index < 0)
 			return null;
 		return plotsOwned.get(index);
+	}
+	
+	public int getPlots()
+	{
+		return plotsOwned.size();
 	}
 	
 	public static PlayerWrapper getWrapper(String player)

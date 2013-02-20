@@ -20,16 +20,22 @@ import kabbage.islandplots.utils.Coordinate;
 public class Plot implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
-	private static final int VERSION = 1;
+	private static final int VERSION = 2;
 	
 	String world;
 	private String owner;
 	private List<String> members;
 	private int plotSize = 100;
+	private int plotPadding = 100;
 	private int x;
 	private int y;
 	private Island island;
 	private Region region;
+	
+	/**
+	 * Empty constructor for externalization
+	 */
+	public Plot() {}
 	
 	Plot(String world, String owner, int gridX, int gridY)
 	{
@@ -86,7 +92,7 @@ public class Plot implements Externalizable
 	 */
 	public int getX()
 	{
-		return x * plotSize;
+		return x * plotSize + x * plotPadding;
 	}
 	
 	/**
@@ -95,7 +101,7 @@ public class Plot implements Externalizable
 	 */
 	public int getZ()
 	{
-		return y * plotSize;
+		return y * plotSize + y * plotPadding;
 	}
 	
 	/**
@@ -127,13 +133,23 @@ public class Plot implements Externalizable
 			owner = in.readUTF();
 			members = (List<String>) in.readObject();
 			plotSize = in.readInt();
+			plotPadding = 100;
 			x = in.readInt();
 			y = in.readInt();
 			island = (Island) in.readObject();
-		} else
+		} else if(ver == 2)
 		{
-			IslandPlots.logger.log(Level.WARNING, "Unsupported version of a Plot failed to load.");
+			world = in.readUTF();
+			owner = in.readUTF();
+			members = (List<String>) in.readObject();
+			plotSize = in.readInt();
+			plotPadding = in.readInt();
+			x = in.readInt();
+			y = in.readInt();
+			island = (Island) in.readObject();
 		}
+		else
+			IslandPlots.logger.log(Level.WARNING, "Unsupported version of a Plot failed to load.");
 	}
 
 	@Override
@@ -145,6 +161,7 @@ public class Plot implements Externalizable
 		out.writeUTF(owner);
 		out.writeObject(members);
 		out.writeInt(plotSize);
+		out.writeInt(plotPadding);
 		out.writeInt(x);
 		out.writeInt(y);
 		out.writeObject(island);

@@ -58,4 +58,20 @@ public class CommandHandler
 		}
 		player.teleport(plot.getIsland().getSpawnPoint());
 	}
+	
+	public void listHomes()
+	{
+		int page = (command.hasArgAtIndex(2)) ? Utils.parseInt(command.getArgAtIndex(2), 1) : 1;
+		PlayerWrapper playerW = PlayerWrapper.getWrapper(senderWrapper.getPlayer());
+		senderWrapper.sendMessage(ChatColor.GOLD+"Owned Island Plots:");
+		for(int i = page * 10; i < page * 10 + 10; i++)
+		{
+			Plot p = playerW.getPlot(i);
+			if(p == null)
+				break;
+			//Args: Color, plot number, color, grid loc x, grid loc y
+			senderWrapper.sendMessage(String.format("%sPlot %d: %s[%d, %d]", ChatColor.DARK_AQUA, i+1, ChatColor.DARK_GRAY, p.getGridX(), p.getGridY()));
+		}
+		senderWrapper.sendMessage(String.format("Page %d/%d", page, playerW.getPlots() / 10));
+	}
 }

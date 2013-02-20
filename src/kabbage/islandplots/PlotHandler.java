@@ -26,10 +26,7 @@ public class PlotHandler implements Externalizable
 	/**
 	 * Empty constructor for externalization
 	 */
-	public PlotHandler()
-	{
-		
-	}
+	public PlotHandler() {}
 	
 	public PlotHandler(String world)
 	{
@@ -53,14 +50,16 @@ public class PlotHandler implements Externalizable
 			Coordinate coord = openPlots.remove(0);
 			plot = new Plot(world, owner, coord);
 			plotGrid.put(coord.x, coord.y, plot);
-		}
-		for(Coordinate coord : getRingOfPlotPositions())
+		} else
 		{
-			if(!plotGrid.contains(coord.x, coord.y))
+			for(Coordinate coord : getRingOfPlotPositions())
 			{
-				plot = new Plot(world, owner, coord.x, coord.y);
-				plotGrid.put(coord.x, coord.y, plot);
-				break;
+				if(!plotGrid.contains(coord.x, coord.y))
+				{
+					plot = new Plot(world, owner, coord.x, coord.y);
+					plotGrid.put(coord.x, coord.y, plot);
+					break;
+				}
 			}
 		}
 		if(plot != null)

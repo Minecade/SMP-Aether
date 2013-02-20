@@ -22,6 +22,11 @@ public class Island implements Externalizable
 	int y;
 	int z;
 	
+	/**
+	 * Empty constructor for externalization
+	 */
+	public Island() {}
+	
 	public Island(String world, int x, int y, int z)
 	{
 		this.world = world;
@@ -32,11 +37,11 @@ public class Island implements Externalizable
 	
 	public void generate()
 	{
-		for(int i = x - 15; i < x + 15; i++)
+		for(int i = x - 10; i < x + 10; i++)
 		{
-			for(int j = y - 15; j < y + 15; j++)
+			for(int j = y - 10; j < y + 10; j++)
 			{
-				for(int k = z - 15; k < z + 15; k++)
+				for(int k = z - 10; k < z + 10; k++)
 				{
 					Bukkit.getWorld(world).getBlockAt(i, j, k).setType(Material.STONE);
 				}
@@ -46,7 +51,7 @@ public class Island implements Externalizable
 	
 	public Location getSpawnPoint()
 	{
-		return new Location(Bukkit.getWorld(world), x, y + 35, z);
+		return new Location(Bukkit.getWorld(world), x, y + 10, z);
 	}
 	
 	@Override
