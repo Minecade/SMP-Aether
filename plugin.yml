@@ -2,7 +2,7 @@ name: IslandPlots
 main: kabbage.islandplots.IslandPlots
 author: kabbage
 version: 0.1
-depend: [Multiverse-Core, NullTerrain]
+depend: [Multiverse-Core, NullTerrain, redProtect]
 commands:
     island:
         description: The plugins basic command.

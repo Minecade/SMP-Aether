@@ -7,6 +7,13 @@ import java.io.ObjectOutput;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+
+import com.OverCaste.plugin.RedProtect.DefineRegionBuilder;
+import com.OverCaste.plugin.RedProtect.Region;
+import com.OverCaste.plugin.RedProtect.RegionBuilder;
+
 import kabbage.islandplots.generation.Island;
 import kabbage.islandplots.utils.Coordinate;
 
@@ -22,19 +29,26 @@ public class Plot implements Externalizable
 	private int x;
 	private int y;
 	private Island island;
+	private Region region;
 	
-	public Plot(String world, String owner, int gridX, int gridY)
+	Plot(String world, String owner, int gridX, int gridY)
 	{
 		this.world = world;
 		this.owner = owner;
 		x = gridX;
 		y = gridY;
 		
+		Location topCorner = new Location(Bukkit.getWorld(world), getX() + plotSize / 2 - 1, 256, getZ() + plotSize / 2 - 1);
+		Location bottomCorner = new Location(Bukkit.getWorld(world), getX() - plotSize / 2, 0, getZ() - plotSize / 2);
+		RegionBuilder builder = new DefineRegionBuilder(Bukkit.getPlayer(owner), topCorner, bottomCorner, "Plot "+gridX+":"+gridY, owner);
+		region = builder.build();
+		IslandPlots.instance.getRedProtect().getGlobalRegionManager().add(region, Bukkit.getWorld(world));
+		
 		island = new Island(world, getX(), 80, getZ());
 		island.generate();
 	}
 	
-	public Plot(String world, String owner, Coordinate coord)
+	Plot(String world, String owner, Coordinate coord)
 	{
 		this(world, owner, coord.x, coord.y);
 	}
@@ -91,6 +105,15 @@ public class Plot implements Externalizable
 	public Island getIsland()
 	{
 		return island;
+	}
+	
+	/**
+	 * Get the region protecting the plot
+	 * @return	region
+	 */
+	public Region getRegion()
+	{
+		return region;
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -21,6 +21,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.OverCaste.plugin.RedProtect.RedProtect;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 
 public class IslandPlots extends JavaPlugin
@@ -28,6 +29,7 @@ public class IslandPlots extends JavaPlugin
 	public static IslandPlots instance;
 	public static Logger logger;
 	private MultiverseCore multiverse;
+	private RedProtect redProtect;
 	
 	private PlotHandler plotHandler;
 	
@@ -49,6 +51,7 @@ public class IslandPlots extends JavaPlugin
 		
 		PluginManager pm = Bukkit.getPluginManager();
 		multiverse = (MultiverseCore) pm.getPlugin("MultiverseCore");
+		redProtect = (RedProtect) pm.getPlugin("redProtect");
 		//Register listeners
 		eListener = new EntityListener();
 		pListener = new PlayerListener();
@@ -73,6 +76,11 @@ public class IslandPlots extends JavaPlugin
 	public MultiverseCore getMultiverse()
 	{
 		return multiverse;
+	}
+	
+	public RedProtect getRedProtect()
+	{
+		return redProtect;
 	}
 	
 	public PlotHandler getPlotHandler()
@@ -129,6 +137,7 @@ public class IslandPlots extends JavaPlugin
 		
 		try
 		{
+			path.createNewFile();
 			FileOutputStream fos = new FileOutputStream(path);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 
@@ -140,6 +149,7 @@ public class IslandPlots extends JavaPlugin
         } catch (IOException e)
         {
         	logger.log(Level.WARNING, "Error saving the PlayerWrapper database.");
+        	e.printStackTrace();
         }
 	}
 	
@@ -152,6 +162,7 @@ public class IslandPlots extends JavaPlugin
 		
 		try
 		{
+			path.createNewFile();
 			FileOutputStream fos = new FileOutputStream(path);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 
@@ -163,6 +174,7 @@ public class IslandPlots extends JavaPlugin
         } catch (IOException e)
         {
         	logger.log(Level.WARNING, "Error saving the PlotHandler database.");
+        	e.printStackTrace();
         }
 	}
 	
