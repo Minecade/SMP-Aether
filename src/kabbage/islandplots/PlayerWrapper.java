@@ -23,6 +23,11 @@ public class PlayerWrapper implements Externalizable
 	private String playerName;
 	private List<Plot> plotsOwned;
 	
+	/**
+	 * Empty constructor for externalization
+	 */
+	public PlayerWrapper() {}
+	
 	private PlayerWrapper(String playerName)
 	{
 		this.playerName = playerName;

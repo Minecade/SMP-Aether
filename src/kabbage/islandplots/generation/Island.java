@@ -9,13 +9,16 @@ import java.util.logging.Level;
 import kabbage.islandplots.IslandPlots;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.World;
 
 public class Island implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
 	private static final int VERSION = 1;
+	private static final int CHUNK_WIDTH = 8;
+	private static final int CHUNK_LENGTH = 8;
 	
 	String world;
 	int x;
@@ -37,13 +40,27 @@ public class Island implements Externalizable
 	
 	public void generate()
 	{
-		for(int i = x - 10; i < x + 10; i++)
+		World world = Bukkit.getWorld(this.world);
+		ChunkGenerator gen = new ChunkGenerator(world);
+		for(int a = -CHUNK_WIDTH >> 1; a < CHUNK_WIDTH >> 1; a++)
 		{
-			for(int j = y - 10; j < y + 10; j++)
+			for(int b = -CHUNK_LENGTH >> 1; b < CHUNK_LENGTH >> 1; b++)
 			{
-				for(int k = z - 10; k < z + 10; k++)
+				Bukkit.broadcastMessage(((x >> 4) + a) + ":" + ((z >> 4) + b));
+				Chunk chunk = world.getChunkAt((x >> 4) + a, (z >> 4) + b);
+				byte[][][] blocks = gen.generateBlocks((x >> 4) + a, (z >> 4) + b);
+				
+				for(int i = 0; i < 16; i++)
 				{
-					Bukkit.getWorld(world).getBlockAt(i, j, k).setType(Material.STONE);
+					for(int j = 0; j < 128; j++)
+					{
+						for(int k = 0; k < 16; k++)
+						{
+							int type = blocks[i][j][k];
+							if(type != 0) // No need to change air to air
+								chunk.getBlock(i, j, k).setTypeId(type);
+						}
+					}
 				}
 			}
 		}
@@ -51,7 +68,7 @@ public class Island implements Externalizable
 	
 	public Location getSpawnPoint()
 	{
-		return new Location(Bukkit.getWorld(world), x, y + 10, z);
+		return new Location(Bukkit.getWorld(world), x, y + 15, z);
 	}
 	
 	@Override
