@@ -8,7 +8,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import kabbage.islandplots.commands.IslandPlotCommands;
 import kabbage.islandplots.listeners.BlockListener;
@@ -27,7 +26,6 @@ import com.onarandombox.MultiverseCore.MultiverseCore;
 public class IslandPlots extends JavaPlugin
 {
 	public static IslandPlots instance;
-	public static Logger logger;
 	private MultiverseCore multiverse;
 	private RedProtect redProtect;
 	
@@ -44,7 +42,6 @@ public class IslandPlots extends JavaPlugin
 	public void onEnable()
 	{
 		instance = this;
-		logger = getLogger();
 		
 		ipCommands = new IslandPlotCommands();
 		getCommand("island").setExecutor(ipCommands);
@@ -105,7 +102,7 @@ public class IslandPlots extends JavaPlugin
 
         } catch (Exception e)
         {
-        	logger.log(Level.WARNING, "Couldn't load the PlayerWrapper database. Ignore if the island world has not yet been created.");
+        	log(Level.WARNING, "Couldn't load the PlayerWrapper database. Ignore if the island world has not yet been created.");
         	e.printStackTrace();
         }
 	}
@@ -127,7 +124,7 @@ public class IslandPlots extends JavaPlugin
 
         } catch (Exception e)
         {
-        	logger.log(Level.WARNING, "Couldn't load the PlotHandler database. Ignore if the island world has not yet been created.");
+        	log(Level.WARNING, "Couldn't load the PlotHandler database. Ignore if the island world has not yet been created.");
         }
 	}
 	
@@ -149,7 +146,7 @@ public class IslandPlots extends JavaPlugin
 
         } catch (IOException e)
         {
-        	logger.log(Level.WARNING, "Error saving the PlayerWrapper database.");
+        	log(Level.WARNING, "Error saving the PlayerWrapper database.");
         	e.printStackTrace();
         }
 	}
@@ -174,7 +171,7 @@ public class IslandPlots extends JavaPlugin
 
         } catch (IOException e)
         {
-        	logger.log(Level.WARNING, "Error saving the PlotHandler database.");
+        	log(Level.WARNING, "Error saving the PlotHandler database.");
         	e.printStackTrace();
         }
 	}
@@ -182,5 +179,15 @@ public class IslandPlots extends JavaPlugin
 	public void setPlotHandler(PlotHandler plotHandler)
 	{
 		this.plotHandler = plotHandler;
+	}
+	
+	public static void log(Level level, String log)
+	{
+		instance.getLogger().log(level, log);
+	}
+	
+	public static void log(String log)
+	{
+		log(Level.INFO, log);
 	}
 }

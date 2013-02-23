@@ -7,13 +7,7 @@ import java.io.ObjectOutput;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-
-import com.OverCaste.plugin.RedProtect.DefineRegionBuilder;
 import com.OverCaste.plugin.RedProtect.Region;
-import com.OverCaste.plugin.RedProtect.RegionBuilder;
-
 import kabbage.islandplots.generation.Island;
 import kabbage.islandplots.utils.Coordinate;
 
@@ -44,11 +38,11 @@ public class Plot implements Externalizable
 		x = gridX;
 		y = gridY;
 		
-		Location topCorner = new Location(Bukkit.getWorld(world), getX() + plotSize / 2 - 1, 256, getZ() + plotSize / 2 - 1);
-		Location bottomCorner = new Location(Bukkit.getWorld(world), getX() - plotSize / 2, 0, getZ() - plotSize / 2);
-		RegionBuilder builder = new DefineRegionBuilder(Bukkit.getPlayer(owner), topCorner, bottomCorner, "Plot "+gridX+":"+gridY, owner);
-		region = builder.build();
-		IslandPlots.instance.getRedProtect().getGlobalRegionManager().add(region, Bukkit.getWorld(world));
+//		Location topCorner = new Location(Bukkit.getWorld(world), getX() + plotSize / 2 - 1, 256, getZ() + plotSize / 2 - 1);
+//		Location bottomCorner = new Location(Bukkit.getWorld(world), getX() - plotSize / 2, 0, getZ() - plotSize / 2);
+//		RegionBuilder builder = new DefineRegionBuilder(Bukkit.getPlayer(owner), topCorner, bottomCorner, "Plot "+gridX+":"+gridY, owner);
+//		region = builder.build();
+//		IslandPlots.instance.getRedProtect().getGlobalRegionManager().add(region, Bukkit.getWorld(world));
 		
 		island = new Island(world, getX(), 80, getZ());
 		island.generate();
@@ -149,7 +143,7 @@ public class Plot implements Externalizable
 			island = (Island) in.readObject();
 		}
 		else
-			IslandPlots.logger.log(Level.WARNING, "Unsupported version of a Plot failed to load.");
+			IslandPlots.log(Level.WARNING, "Unsupported version of a Plot failed to load.");
 	}
 
 	@Override

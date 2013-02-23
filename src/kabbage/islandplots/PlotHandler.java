@@ -96,7 +96,7 @@ public class PlotHandler implements Externalizable
 			ring.add(new Coordinate(currentRing, y));
 			ring.add(new Coordinate(-currentRing, y));
 		}
-		IslandPlots.logger.log(Level.INFO, ring.toString());
+		IslandPlots.log(Level.INFO, ring.toString());
 		return ring;
 	}
 	
@@ -113,7 +113,7 @@ public class PlotHandler implements Externalizable
 			openPlots = (List<Coordinate>) in.readObject();
 		} else
 		{
-			IslandPlots.logger.log(Level.WARNING, "Unsupported version of the PlotHandler failed to load.");
+			IslandPlots.log(Level.WARNING, "Unsupported version of the PlotHandler failed to load.");
 		}
 	}
 

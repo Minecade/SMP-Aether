@@ -92,7 +92,7 @@ public class PlayerWrapper implements Externalizable
 			plotsOwned = (List<Plot>) in.readObject();
 		} else
 		{
-			IslandPlots.logger.log(Level.WARNING, "Unsupported version of an Island failed to load.");
+			IslandPlots.log(Level.WARNING, "Unsupported version of an Island failed to load.");
 		}
 	}
 
