@@ -19,7 +19,7 @@ public class Plot implements Externalizable
 	String world;
 	private String owner;
 	private List<String> members;
-	private int plotSize = 128;
+	private int plotSize = 320;
 	private int plotPadding = 100;
 	private int x;
 	private int y;

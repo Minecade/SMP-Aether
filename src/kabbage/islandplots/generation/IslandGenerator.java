@@ -5,7 +5,9 @@ import java.util.Random;
 import kabbage.islandplots.IslandPlots;
 
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 
 public class IslandGenerator
 {
@@ -31,28 +33,32 @@ public class IslandGenerator
 	public void generate(int width, int length, int height)
 	{
 		PerlinNoise noise = new PerlinNoise(seed, width << 4, length << 4);
-//		for(int x = -width << 3; x < width << 3; x++)
-//		{
-//			for(int z = -length << 3; z < length << 3; z++)
-//			{
-//				for(int y = height / -2; y < noise.islandNoise(x, z, 6, 0.5f) * height; y++)
-//					world.getBlockAt(this.x + x, y + this.y, this.z + z).setTypeId(1);
-//			}
-//		}
-		IslandPlots.log("Generating chunks");
 		for(int a = (x >> 4) - (width >> 1); a < (x >> 4) + (width >> 1); a++)
 		{
 			for(int b = (z >> 4) - (length >> 1); b < (z >> 4) + (length >> 1); b++)
 			{
-				IslandPlots.log("Generating chunk: ["+a+", "+b+"]");
 				for(int i = 0; i < 16; i++)
 				{
 					for(int k = 0; k < 16; k++)
 					{
 						int worldX = i + a * 16;
 						int worldZ = k + b * 16;
-						for(int y = height / -2; y < noise.islandNoise(worldX - x, worldZ - z, 6, 0.5f) * height; y++)
-							world.getBlockAt(worldX, y + this.y, worldZ).setTypeId(1);
+						int noiseVal = (int) ((noise.islandNoise(worldX - x, worldZ - z, 12, 0.45f) + .5) * height);	//Add .5 to initial noise to increase volume
+						Biome biome = world.getBlockAt(worldX, y, worldZ).getBiome();
+						for(int y = 0; y < noiseVal; y++)
+						{
+							byte type = 1;
+							//Decorate top of land mass
+							if(noiseVal - y <= 3)
+							{
+								if (biome == Biome.DESERT)
+									type = (noiseVal - y == 3 || noiseVal < 2) ? (byte) Material.SANDSTONE.getId() : (byte) Material.SAND.getId();
+								else
+									type = noiseVal - y == 1 ? (byte) Material.GRASS.getId() : (byte) Material.DIRT.getId();
+							}
+							world.getBlockAt(worldX, this.y - y, worldZ).setTypeId(1);
+							world.getBlockAt(worldX, this.y + y, worldZ).setTypeId(type);
+						}
 					}
 				}
 				Chunk chunk = world.getChunkAt(a, b);

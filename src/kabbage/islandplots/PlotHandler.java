@@ -96,7 +96,6 @@ public class PlotHandler implements Externalizable
 			ring.add(new Coordinate(currentRing, y));
 			ring.add(new Coordinate(-currentRing, y));
 		}
-		IslandPlots.log(Level.INFO, ring.toString());
 		return ring;
 	}
 	

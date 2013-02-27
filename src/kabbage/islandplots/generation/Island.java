@@ -15,9 +15,9 @@ public class Island implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
 	private static final int VERSION = 1;
-	private static final int CHUNK_WIDTH = 6;
-	private static final int CHUNK_LENGTH = 6;
-	private static final int HEIGHT = 32;
+	private static final int CHUNK_WIDTH = 18;
+	private static final int CHUNK_LENGTH = 18;
+	private static final int HEIGHT = 24;
 	
 	String world;
 	int x;
@@ -45,7 +45,7 @@ public class Island implements Externalizable
 	
 	public Location getSpawnPoint()
 	{
-		return new Location(Bukkit.getWorld(world), x, y + 32, z);
+		return new Location(Bukkit.getWorld(world), x, y + HEIGHT, z);
 	}
 	
 	@Override

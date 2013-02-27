@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Random;
 
+import kabbage.islandplots.IslandPlots;
+
 public class PerlinNoise
 {
 	int prime;
@@ -130,8 +132,15 @@ public class PerlinNoise
 	public float islandNoise(float x, float z, int octaves, float persistence)
 	{
 		float noise = perlinNoise(x, z, octaves, persistence);
-		float distFromCenterNormalized = (float) Math.sqrt(Math.pow(x / (width/2), 2) + Math.pow(0 - z / (height/2), 2));
-		noise -= distFromCenterNormalized/2;
+		float distFromCenterNormalized = (float) Math.sqrt(Math.pow(x / (width), 2) + Math.pow(z / (height), 2));
+		if(Math.abs(x) > width/2*.9 || Math.abs(z) > height/2*.9)	//Ensures that there's no terrain at the very outer edges
+			noise -= distFromCenterNormalized * 1.95;
+		else if(Math.abs(x) > width/2*.8 || Math.abs(z) > height/2*.8)	//Transition to the drop above
+			noise -= distFromCenterNormalized * 1.8;
+		else if(Math.abs(x) > width/2*.7 || Math.abs(z) > height/2*.7)	//Transition to the drop above
+			noise -= distFromCenterNormalized * 1.65;
+		else
+			noise -= distFromCenterNormalized * 1.5;
 		return noise;
 	}
 }
