@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.bukkit.Location;
+
 import kabbage.islandplots.utils.Coordinate;
 
 import com.google.common.collect.Table;
@@ -17,6 +19,9 @@ public class PlotHandler implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
 	private static final int VERSION = 1;
+	
+	static final int PLOT_SIZE = 300;
+	static final int PLOT_PADDING = 100;
 	
 	private String world;
 	private Table<Integer, Integer, Plot> plotGrid;
@@ -77,6 +82,29 @@ public class PlotHandler implements Externalizable
 		IslandPlots.instance.getRedProtect().getGlobalRegionManager().remove(plot.getRegion());
 		openPlots.add(plot.getGridLocation());
 		plotGrid.remove(plot.getGridX(), plot.getGridX());
+	}
+	
+	/**
+	 * Get a plot by it's location in the world
+	 * @param loc	location in world
+	 * @return		the plot
+	 */
+	public Plot getPlot(Location loc)
+	{	
+		int x = (int) loc.getX();
+		int z = (int) loc.getZ();
+		return getPlot(x / (PLOT_SIZE/2 + PLOT_PADDING), z / (PLOT_SIZE/2 + PLOT_PADDING));
+	}
+	
+	/**
+	 * Get a plot by it's location in the grid
+	 * @param x		grid x
+	 * @param z		grid z
+	 * @return		the plot
+	 */
+	public Plot getPlot(int x, int z)
+	{
+		return plotGrid.get(x, z);
 	}
 	
 	/**

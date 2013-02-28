@@ -46,6 +46,9 @@ public class IslandPlotCommands implements CommandExecutor
 			case "list":
 				handler.listHomes();
 				break;
+			case "info":
+				handler.sendInfo();
+				break;
 			default:
 				hardFailure = true;
 			}

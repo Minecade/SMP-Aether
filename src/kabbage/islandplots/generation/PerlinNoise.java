@@ -4,8 +4,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import kabbage.islandplots.IslandPlots;
-
 public class PerlinNoise
 {
 	int prime;
@@ -102,6 +100,27 @@ public class PerlinNoise
 		// Interpolate them and return the result
 		return interpolate(a, b, c, d, x - floorX, z - floorZ);
 	}
+	/**
+	 * Adds an octave to existing noise
+	 * @param x				x coordinate
+	 * @param z				z coordinate
+	 * @param noise			current noise
+	 * @param persistence	persistence to use in calculation. Higher persistence means higher amplitude in higher octaves,
+	 * 						which means more roughness. Conversely, lower persistence will result in less roughness. This should
+	 * 						be a value between 0.0 and 1.0
+	 * @param octaveNum		how many octaves already added to the noise. This parameter doesn't have to be accurate
+	 * @return				resulting noise after an octave has been added to it
+	 */
+	public float addOctave(float x, float z, float noise, float persistence, float octaveNum)
+	{
+		// Increase frequency and decrease amplitude for each sucessive octave
+		int frequency = (int) Math.pow(2, octaveNum);
+		float amplitude = (float) Math.pow(persistence, octaveNum);
+
+		// Add this octaves noise to the total noise
+		noise += interpolatedNoise(x * frequency/15, z * frequency/15) * amplitude;
+		return noise;
+	}
 
 	/**
 	 * Calculates perlin noise for a specified coordinate
@@ -133,14 +152,8 @@ public class PerlinNoise
 	{
 		float noise = perlinNoise(x, z, octaves, persistence);
 		float distFromCenterNormalized = (float) Math.sqrt(Math.pow(x / (width), 2) + Math.pow(z / (height), 2));
-		if(Math.abs(x) > width/2*.9 || Math.abs(z) > height/2*.9)	//Ensures that there's no terrain at the very outer edges
-			noise -= distFromCenterNormalized * 1.95;
-		else if(Math.abs(x) > width/2*.8 || Math.abs(z) > height/2*.8)	//Transition to the drop above
-			noise -= distFromCenterNormalized * 1.8;
-		else if(Math.abs(x) > width/2*.7 || Math.abs(z) > height/2*.7)	//Transition to the drop above
-			noise -= distFromCenterNormalized * 1.65;
-		else
-			noise -= distFromCenterNormalized * 1.5;
+		distFromCenterNormalized = (float) Math.pow(distFromCenterNormalized, .75);	//Makes the effect increase much more as you get further away from center
+		noise -= distFromCenterNormalized * 1.5;
 		return noise;
 	}
 }

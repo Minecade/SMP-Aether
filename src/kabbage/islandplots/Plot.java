@@ -4,6 +4,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -14,17 +15,17 @@ import kabbage.islandplots.utils.Coordinate;
 public class Plot implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
-	private static final int VERSION = 2;
+	private static final int VERSION = 3;
 	
 	String world;
 	private String owner;
 	private List<String> members;
-	private int plotSize = 320;
-	private int plotPadding = 100;
 	private int x;
 	private int y;
 	private Island island;
 	private Region region;
+	private int level;
+	private int blockChanges;
 	
 	/**
 	 * Empty constructor for externalization
@@ -35,8 +36,11 @@ public class Plot implements Externalizable
 	{
 		this.world = world;
 		this.owner = owner;
+		members = new ArrayList<String>();
 		x = gridX;
 		y = gridY;
+		level = 0;
+		blockChanges = 0;
 		
 //		Location topCorner = new Location(Bukkit.getWorld(world), getX() + plotSize / 2 - 1, 256, getZ() + plotSize / 2 - 1);
 //		Location bottomCorner = new Location(Bukkit.getWorld(world), getX() - plotSize / 2, 0, getZ() - plotSize / 2);
@@ -86,7 +90,7 @@ public class Plot implements Externalizable
 	 */
 	public int getX()
 	{
-		return x * plotSize + x * plotPadding;
+		return x * PlotHandler.PLOT_SIZE + x * PlotHandler.PLOT_PADDING;
 	}
 	
 	/**
@@ -95,7 +99,7 @@ public class Plot implements Externalizable
 	 */
 	public int getZ()
 	{
-		return y * plotSize + y * plotPadding;
+		return y * PlotHandler.PLOT_SIZE + y * PlotHandler.PLOT_PADDING;
 	}
 	
 	/**
@@ -116,6 +120,32 @@ public class Plot implements Externalizable
 		return region;
 	}
 	
+	public void registerBlockChange()
+	{
+		blockChanges++;
+	}
+	
+	public String getOwner()
+	{
+		return owner;
+	}
+	
+	public List<String> getMembers()
+	{
+		return members;
+	}
+	
+	public int getLevel()
+	{
+		return level;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "Plot: ["+x+", "+y+"]";
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
@@ -126,21 +156,31 @@ public class Plot implements Externalizable
 			world = in.readUTF();
 			owner = in.readUTF();
 			members = (List<String>) in.readObject();
-			plotSize = in.readInt();
-			plotPadding = 100;
 			x = in.readInt();
 			y = in.readInt();
 			island = (Island) in.readObject();
+			level = 0;
 		} else if(ver == 2)
 		{
 			world = in.readUTF();
 			owner = in.readUTF();
 			members = (List<String>) in.readObject();
-			plotSize = in.readInt();
-			plotPadding = in.readInt();
+			in.readInt();
+			in.readInt();
 			x = in.readInt();
 			y = in.readInt();
 			island = (Island) in.readObject();
+			level = 0;
+		} else if(ver == 3)
+		{
+			world = in.readUTF();
+			owner = in.readUTF();
+			members = (List<String>) in.readObject();
+			x = in.readInt();
+			y = in.readInt();
+			island = (Island) in.readObject();
+			level = in.readInt();
+			blockChanges = in.readInt();
 		}
 		else
 			IslandPlots.log(Level.WARNING, "Unsupported version of a Plot failed to load.");
@@ -154,10 +194,10 @@ public class Plot implements Externalizable
 		out.writeUTF(world);
 		out.writeUTF(owner);
 		out.writeObject(members);
-		out.writeInt(plotSize);
-		out.writeInt(plotPadding);
 		out.writeInt(x);
 		out.writeInt(y);
 		out.writeObject(island);
+		out.writeInt(level);
+		out.writeInt(blockChanges);
 	}
 }

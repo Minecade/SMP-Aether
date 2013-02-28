@@ -2,8 +2,11 @@ package kabbage.islandplots.generation;
 
 import java.util.Random;
 
+import net.minecraft.server.v1_4_R1.WorldGenDungeons;
+
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
 
 public class ChunkPopulator
 {
@@ -31,5 +34,6 @@ public class ChunkPopulator
 		new SnowPopulator().populate(world, rnd, chunk);
 		new MushroomPopulator(world).populate(world, rnd, chunk);
 		new CactusPopulator(world).populate(world, rnd, chunk);
+		new WorldGenDungeons().a(((CraftWorld) world).getHandle(), rnd, chunk.getX() << 4, rnd.nextInt(128), chunk.getZ() << 4);
 	}
 }

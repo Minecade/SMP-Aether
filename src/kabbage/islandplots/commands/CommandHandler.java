@@ -1,5 +1,7 @@
 package kabbage.islandplots.commands;
 
+import java.util.List;
+
 import kabbage.islandplots.IslandPlots;
 import kabbage.islandplots.PlayerWrapper;
 import kabbage.islandplots.Plot;
@@ -73,5 +75,21 @@ public class CommandHandler
 			senderWrapper.sendMessage(String.format("%sPlot %d: %s[%d, %d]", ChatColor.DARK_AQUA, i+1, ChatColor.DARK_GRAY, p.getGridX(), p.getGridY()));
 		}
 		senderWrapper.sendMessage(String.format("Page %d/%d", page, playerW.getPlots() / 10));
+	}
+
+	public void sendInfo()
+	{
+		Plot plot = plugin.getPlotHandler().getPlot(senderWrapper.getPlayer().getLocation());
+		if(plot == null)
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You are not currently in a plot to get information on.");
+			return;
+		}
+		senderWrapper.sendMessage(ChatColor.DARK_AQUA+plot.toString());
+		senderWrapper.sendMessage(ChatColor.GOLD+"Owner: "+plot.getOwner());
+		List<String> members = plot.getMembers();
+		if(members.size() > 0)
+			senderWrapper.sendMessage(ChatColor.GOLD+"Members: "+members.toString().replaceAll("]|[", ""));
+		senderWrapper.sendMessage(ChatColor.GOLD+"Level: "+plot.getLevel());
 	}
 }
