@@ -4,12 +4,15 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 import kabbage.islandplots.IslandPlots;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 
 public class Island implements Externalizable
 {
@@ -19,6 +22,7 @@ public class Island implements Externalizable
 	private static final int CHUNK_LENGTH = 18;
 	private static final int HEIGHT = 24;
 	
+	private transient Location spawnCache;
 	String world;
 	int x;
 	int y;
@@ -45,7 +49,31 @@ public class Island implements Externalizable
 	
 	public Location getSpawnPoint()
 	{
-		return new Location(Bukkit.getWorld(world), x, y + HEIGHT, z);
+		if(spawnCache != null && !isSafeSpawn(spawnCache))
+			return Bukkit.getWorld(world).getHighestBlockAt(spawnCache).getLocation();
+		// Find a safe spawn point
+		Location start = new Location(Bukkit.getWorld(world), x, y, z);
+		int attempt = 0;
+		while(!isSafeSpawn(start))
+		{
+			if(attempt > 400)
+				break;
+			if(attempt % 20 == 0)
+			{
+				start.setX(start.getX()+1);
+				start.setY(y);
+			} else
+			{
+				start.setY(start.getY() - 1);
+			}
+		}
+		return spawnCache = start = Bukkit.getWorld(world).getHighestBlockAt(start).getLocation();
+	}
+	
+	private List<Integer> unsafe = Arrays.asList(new Integer[]{0, 10, 11, 51});
+	private boolean isSafeSpawn(Location loc)
+	{
+		return !unsafe.contains(spawnCache.getBlock().getRelative(BlockFace.DOWN).getTypeId());
 	}
 	
 	@Override
