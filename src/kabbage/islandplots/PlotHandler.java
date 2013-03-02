@@ -95,7 +95,7 @@ public class PlotHandler implements Externalizable
 		int z = (int) loc.getZ();
 		int xPosNeg = (x < 0) ? -2 : 2;
 		int zPosNeg = (z < 0) ? -2 : 2;
-		return getPlot(x+PLOT_SIZE/xPosNeg / (PLOT_SIZE + PLOT_PADDING), z+PLOT_SIZE/zPosNeg / (PLOT_SIZE + PLOT_PADDING));
+		return getPlot((x + PLOT_SIZE/xPosNeg) / (PLOT_SIZE + PLOT_PADDING), (z + PLOT_SIZE/zPosNeg) / (PLOT_SIZE + PLOT_PADDING));
 	}
 	
 	/**

@@ -1,47 +1,75 @@
 package kabbage.islandplots.generation;
 
-import kabbage.islandplots.IslandPlots;
-
 import java.util.Random;
 import java.util.Stack;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
+import kabbage.islandplots.IslandPlots;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
-public class IslandGenerator
+public class IslandGenerator extends BukkitRunnable
 {
 	World world;
 	int x;
 	int y;
 	int z;
+	int width;
+	int length;
+	int height;
 	
 	Random rnd;
 	long seed;
 	
-	public IslandGenerator(int x, int y, int z, org.bukkit.World world)
+	String player;
+	
+	public IslandGenerator(org.bukkit.World world, int x, int y, int z, int width, int length, int height, String player)
 	{
 		this.world = world;
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		this.width = width;
+		this.length = length;
+		this.height = height;
 		
 		seed = new Random().nextLong();
 		rnd = new Random(seed);
+		this.player = player;
 	}
 	
-	public void generate(int width, int length, int height)
+	@Override
+	public void run()
 	{
 		PerlinNoise noise = new PerlinNoise(seed, width << 4, length << 4);
 		net.minecraft.server.v1_4_R1.World nmsWorld = ((CraftWorld) world).getHandle();
 		Stack<Chunk> toPopulate = new Stack<Chunk>();
+		int doneSoFar = 0;
+		int todo = width * length;
+		int last = 0;
 		for(int a = (x >> 4) - (width >> 1); a < (x >> 4) + (width >> 1); a++)
 		{
 			for(int b = (z >> 4) - (length >> 1); b < (z >> 4) + (length >> 1); b++)
 			{
-				IslandPlots.log("Generating chunk: ["+a+", "+b+"]");
+				//Inform the player generating the island of progress
+				int percentDone = (int) ((++doneSoFar / (float) todo) * 100);
+				if(percentDone % 10 == 0 && percentDone != last)
+				{
+					Player player = Bukkit.getPlayer(this.player);
+					if(player != null) player.sendMessage(ChatColor.GOLD+"Generating chunks: "+percentDone+"%...");
+				}
+				last = percentDone;
+				
+				//Now actually do the generating
 				Chunk chunk = world.getChunkAt(a, b);
 				chunk.load();
 				toPopulate.add(chunk);
@@ -83,6 +111,41 @@ public class IslandGenerator
 				}
 			}
 		}
-		for(Chunk chunk : toPopulate) new ChunkPopulator(world, chunk, rnd).populate();
+		doneSoFar = 0;
+		last = 0;
+		for(Chunk chunk : toPopulate) 
+		{
+			//Inform the player populating the island of progress
+			int percentDone = (int) ((++doneSoFar / (float) todo) * 100);
+			if(percentDone % 10 == 0 && percentDone != last)
+			{
+				Player player = Bukkit.getPlayer(this.player);
+				if(player != null) player.sendMessage(ChatColor.GOLD+"Populating chunks: "+percentDone+"%...");
+			}
+			last = percentDone;
+			
+			//Now actually populate the island
+			new ChunkPopulator(world, chunk, rnd, y).populate();
+		}
+	}
+	
+	class FutureGetChunk implements Callable<Chunk>
+	{
+		int x;
+		int z;
+		
+		public FutureGetChunk(int x, int z)
+		{
+			this.x = x;
+			this.z = z;
+		}
+		@Override
+		public Chunk call() throws Exception
+		{
+			Chunk chunk = world.getChunkAt(x, z);
+			chunk.load();
+			return chunk;
+		}
+		
 	}
 }

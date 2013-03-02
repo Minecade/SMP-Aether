@@ -49,7 +49,7 @@ public class Plot implements Externalizable
 //		IslandPlots.instance.getRedProtect().getGlobalRegionManager().add(region, Bukkit.getWorld(world));
 		
 		island = new Island(world, getX(), 80, getZ());
-		island.generate();
+		island.generate(owner);
 	}
 	
 	Plot(String world, String owner, Coordinate coord)

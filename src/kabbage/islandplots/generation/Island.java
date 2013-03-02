@@ -41,10 +41,10 @@ public class Island implements Externalizable
 		this.z = z;
 	}
 	
-	public void generate()
+	public void generate(String player)
 	{
-		IslandGenerator generator = new IslandGenerator(x, y, z, Bukkit.getWorld(world));
-		generator.generate(CHUNK_WIDTH, CHUNK_LENGTH, HEIGHT);
+		IslandGenerator generator = new IslandGenerator(Bukkit.getWorld(world), x, y, z, CHUNK_WIDTH, CHUNK_LENGTH, HEIGHT, player);
+		generator.run();
 	}
 	
 	public Location getSpawnPoint()

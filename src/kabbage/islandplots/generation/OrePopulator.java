@@ -97,7 +97,7 @@ public class OrePopulator extends BlockPopulator
 			this.createClump(world, Material.GRAVEL, 32, x, y, z);
 		}
 
-		for (i = 0; i < 20; ++i)
+		for (i = 0; i < 16; ++i)
 		{
 			x = worldChunkX + this.random.nextInt(16);
 			z = worldChunkZ + this.random.nextInt(16);
@@ -106,7 +106,7 @@ public class OrePopulator extends BlockPopulator
 			this.createClump(world, Material.COAL_ORE, 16, x, y, z);
 		}
 
-		for (i = 0; i < 30; ++i)
+		for (i = 0; i < 24; ++i)
 		{
 			x = worldChunkX + this.random.nextInt(16);
 			z = worldChunkZ + this.random.nextInt(16);
@@ -115,7 +115,7 @@ public class OrePopulator extends BlockPopulator
 			this.createClump(world, Material.IRON_ORE, 12, x, y, z);
 		}
 
-		for (i = 0; i < 10; ++i)
+		for (i = 0; i < 8; ++i)
 		{
 			x = worldChunkX + this.random.nextInt(16);
 			z = worldChunkZ + this.random.nextInt(16);
@@ -124,7 +124,7 @@ public class OrePopulator extends BlockPopulator
 			this.createClump(world, Material.GOLD_ORE, 8, x, y, z);
 		}
 
-		for (i = 0; i < 16; ++i)
+		for (i = 0; i < 12; ++i)
 		{
 			x = worldChunkX + this.random.nextInt(16);
 			z = worldChunkZ + this.random.nextInt(16);
@@ -133,7 +133,7 @@ public class OrePopulator extends BlockPopulator
 			this.createClump(world, Material.REDSTONE_ORE, 7, x, y, z);
 		}
 
-		for (i = 0; i < 8; ++i)
+		for (i = 0; i < 6; ++i)
 		{
 			x = worldChunkX + this.random.nextInt(16);
 			z = worldChunkZ + this.random.nextInt(16);
@@ -142,7 +142,7 @@ public class OrePopulator extends BlockPopulator
 			this.createClump(world, Material.DIAMOND_ORE, 7, x, y, z);
 		}
 
-		for (i = 0; i < 8; ++i)
+		for (i = 0; i < 6; ++i)
 		{
 			x = worldChunkX + this.random.nextInt(16);
 			z = worldChunkZ + this.random.nextInt(16);

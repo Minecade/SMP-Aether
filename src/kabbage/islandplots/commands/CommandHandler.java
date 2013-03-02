@@ -44,6 +44,7 @@ public class CommandHandler
 			return;
 		}
 		Plot plot = plugin.getPlotHandler().appendPlot(playerName);
+		senderWrapper.sendMessage(ChatColor.GOLD+"Finding safe spawn point...");
 		senderWrapper.getPlayer().teleport(plot.getIsland().getSpawnPoint());
 	}
 
