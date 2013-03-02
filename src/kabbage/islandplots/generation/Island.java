@@ -20,7 +20,7 @@ public class Island implements Externalizable
 	private static final int VERSION = 1;
 	private static final int CHUNK_WIDTH = 18;
 	private static final int CHUNK_LENGTH = 18;
-	private static final int HEIGHT = 24;
+	private static final int HEIGHT = 32;
 	
 	private transient Location spawnCache;
 	String world;
@@ -52,7 +52,7 @@ public class Island implements Externalizable
 		if(spawnCache != null && !isSafeSpawn(spawnCache))
 			return Bukkit.getWorld(world).getHighestBlockAt(spawnCache).getLocation();
 		// Find a safe spawn point
-		Location start = new Location(Bukkit.getWorld(world), x, y, z);
+		Location start = new Location(Bukkit.getWorld(world), x, y + HEIGHT, z);
 		int attempt = 0;
 		while(!isSafeSpawn(start))
 		{
@@ -61,10 +61,10 @@ public class Island implements Externalizable
 			if(attempt % 20 == 0)
 			{
 				start.setX(start.getX()+1);
-				start.setY(y);
+				start.setZ(z);
 			} else
 			{
-				start.setY(start.getY() - 1);
+				start.setZ(start.getZ()+1);
 			}
 		}
 		return spawnCache = start = Bukkit.getWorld(world).getHighestBlockAt(start).getLocation();
@@ -73,7 +73,7 @@ public class Island implements Externalizable
 	private List<Integer> unsafe = Arrays.asList(new Integer[]{0, 10, 11, 51});
 	private boolean isSafeSpawn(Location loc)
 	{
-		return !unsafe.contains(spawnCache.getBlock().getRelative(BlockFace.DOWN).getTypeId());
+		return !unsafe.contains(Bukkit.getWorld(world).getHighestBlockAt(loc).getRelative(BlockFace.DOWN).getTypeId());
 	}
 	
 	@Override

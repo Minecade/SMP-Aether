@@ -3,6 +3,7 @@ package kabbage.islandplots.generation;
 import kabbage.islandplots.IslandPlots;
 
 import java.util.Random;
+import java.util.Stack;
 
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -35,6 +36,7 @@ public class IslandGenerator
 	{
 		PerlinNoise noise = new PerlinNoise(seed, width << 4, length << 4);
 		net.minecraft.server.v1_4_R1.World nmsWorld = ((CraftWorld) world).getHandle();
+		Stack<Chunk> toPopulate = new Stack<Chunk>();
 		for(int a = (x >> 4) - (width >> 1); a < (x >> 4) + (width >> 1); a++)
 		{
 			for(int b = (z >> 4) - (length >> 1); b < (z >> 4) + (length >> 1); b++)
@@ -42,13 +44,14 @@ public class IslandGenerator
 				IslandPlots.log("Generating chunk: ["+a+", "+b+"]");
 				Chunk chunk = world.getChunkAt(a, b);
 				chunk.load();
+				toPopulate.add(chunk);
 				for(int i = 0; i < 16; i++)
 				{
 					for(int k = 0; k < 16; k++)
 					{
 						int worldX = i + a * 16;
 						int worldZ = k + b * 16;
-						float noiseVal = (float) (noise.islandNoise(worldX - x, worldZ - z, 6, 0.45f) + .5);	//Add .5 to initial noise to increase volume
+						float noiseVal = (float) (noise.islandNoise(worldX - x, worldZ - z, 8, 0.45f) + .5);	//Add .5 to initial noise to increase volume
 						Biome biome = world.getBlockAt(worldX, y, worldZ).getBiome();
 						boolean doBottom = false;
 						int sectionHeight = (int) (noiseVal * height);
@@ -61,7 +64,7 @@ public class IslandGenerator
 							if(sectionHeight - y <= 3)
 							{
 								if (biome == Biome.DESERT)
-									type = y + 1 > sectionHeight ? (byte) Material.SANDSTONE.getId() : (byte) Material.SAND.getId();
+									type = y == 0 ? (byte) Material.SANDSTONE.getId() : (byte) Material.SAND.getId();
 								else
 									type = sectionHeight - y == 0 ? (byte) Material.GRASS.getId() : (byte) Material.DIRT.getId();
 							}
@@ -78,8 +81,8 @@ public class IslandGenerator
 						}
 					}
 				}
-				new ChunkPopulator(world, chunk, rnd).populate();
 			}
 		}
+		for(Chunk chunk : toPopulate) new ChunkPopulator(world, chunk, rnd).populate();
 	}
 }
