@@ -12,6 +12,11 @@ import org.bukkit.generator.BlockPopulator;
 
 public class SnowPopulator extends BlockPopulator
 {
+	public SnowPopulator(World world)
+	{
+		
+	}
+	
 	public void populate(World world, Random random, Chunk chunk)
 	{
 		int chunkX = chunk.getX() * 16;

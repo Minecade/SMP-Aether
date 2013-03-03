@@ -43,8 +43,8 @@ public class Island implements Externalizable
 	
 	public void generate(String player)
 	{
-		IslandGenerator generator = new IslandGenerator(Bukkit.getWorld(world), x, y, z, CHUNK_WIDTH, CHUNK_LENGTH, HEIGHT, player);
-		generator.run();
+		IslandGenerator generator = new IslandGenerator(this, Bukkit.getWorld(world), x, y, z, CHUNK_WIDTH, CHUNK_LENGTH, HEIGHT, player);
+		Bukkit.getScheduler().runTaskAsynchronously(IslandPlots.instance, generator);
 	}
 	
 	public Location getSpawnPoint()
@@ -56,9 +56,9 @@ public class Island implements Externalizable
 		int attempt = 0;
 		while(!isSafeSpawn(start))
 		{
-			if(attempt > 400)
+			if(attempt > 100)
 				break;
-			if(attempt % 20 == 0)
+			if(attempt % 10 == 0)
 			{
 				start.setX(start.getX()+1);
 				start.setZ(z);

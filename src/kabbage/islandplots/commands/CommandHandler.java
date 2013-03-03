@@ -43,9 +43,7 @@ public class CommandHandler
 			senderWrapper.sendMessage(ChatColor.RED+"You are not allowed to have another plot.");
 			return;
 		}
-		Plot plot = plugin.getPlotHandler().appendPlot(playerName);
-		senderWrapper.sendMessage(ChatColor.GOLD+"Finding safe spawn point...");
-		senderWrapper.getPlayer().teleport(plot.getIsland().getSpawnPoint());
+		plugin.getPlotHandler().appendPlot(playerName);
 	}
 
 	public void teleportHome()
