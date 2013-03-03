@@ -246,7 +246,7 @@ public class IslandGenerator extends BukkitRunnable
 		public SetSyncBlocks(Chunk chunk, byte[][][] blocks)
 		{
 			this.chunk = ((CraftChunk) chunk).getHandle();
-			this.blocks = blocks;
+			this.blocks = blocks.clone();
 		}
 		
 		@Override

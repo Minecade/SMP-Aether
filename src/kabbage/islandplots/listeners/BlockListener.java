@@ -40,12 +40,7 @@ public class BlockListener implements Listener
 	private void registerBlockChange(Location location)
 	{
 		Plot plot = plugin.getPlotHandler().getPlot(location);
-		if(plot == null)
-			IslandPlots.log("null");
-		else
-		{
-			IslandPlots.log(plot.getX() + ":" + plot.getZ());
+		if(plot != null)
 			plot.registerBlockChange();
-		}
 	}
 }

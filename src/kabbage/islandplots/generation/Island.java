@@ -18,8 +18,8 @@ public class Island implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
 	private static final int VERSION = 1;
-	private static final int CHUNK_WIDTH = 18;
-	private static final int CHUNK_LENGTH = 18;
+	private static final int CHUNK_WIDTH = 12;
+	private static final int CHUNK_LENGTH = 12;
 	private static final int HEIGHT = 32;
 	
 	private transient Location spawnCache;
