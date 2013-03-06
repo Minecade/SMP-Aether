@@ -123,6 +123,17 @@ public class Plot implements Externalizable
 	public void registerBlockChange()
 	{
 		blockChanges++;
+		if(blockChanges % 25 == 0)
+		{
+			if(level < 5)
+			{
+				if(blockChanges >= 50*level*level + 25)
+					level++;
+			} else
+			{
+				
+			}
+		}
 	}
 	
 	public String getOwner()
