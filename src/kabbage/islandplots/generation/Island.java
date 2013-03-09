@@ -6,13 +6,15 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import kabbage.islandplots.IslandPlots;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.bukkit.util.Vector;
 
 public class Island implements Externalizable
 {
@@ -52,22 +54,51 @@ public class Island implements Externalizable
 		if(spawnCache != null && !isSafeSpawn(spawnCache))
 			return Bukkit.getWorld(world).getHighestBlockAt(spawnCache).getLocation();
 		// Find a safe spawn point
-		Location start = new Location(Bukkit.getWorld(world), x, y + HEIGHT, z);
-		int attempt = 0;
-		while(!isSafeSpawn(start))
+		final Vector start = new Vector(x, y + HEIGHT, z);
+		Bukkit.getScheduler().runTaskAsynchronously(IslandPlots.instance, new Runnable()
 		{
-			if(attempt > 100)
-				break;
-			if(attempt % 10 == 0)
+			@Override
+			public void run()
 			{
-				start.setX(start.getX()+1);
-				start.setZ(z);
-			} else
-			{
-				start.setZ(start.getZ()+1);
+				int attempt = 0;
+				try
+				{
+					while(Bukkit.getScheduler().callSyncMethod(IslandPlots.instance, new SyncIsSafeSpawn(start)).get())
+					{
+						if(attempt > 100)
+							break;
+						if(attempt % 10 == 0)
+						{
+							start.setX(start.getX()+1);
+							start.setZ(z);
+						} else
+						{
+							start.setZ(start.getZ()+1);
+						}
+					}
+				} catch (InterruptedException|ExecutionException e)
+				{
+					e.printStackTrace();
+				}
 			}
+		});
+		return spawnCache = Bukkit.getWorld(world).getHighestBlockAt(new Location(Bukkit.getWorld(world), start.getX(), start.getY(), start.getZ())).getLocation();
+	}
+	
+	class SyncIsSafeSpawn implements Callable<Boolean>
+	{
+		Vector spawn;
+		public SyncIsSafeSpawn(Vector spawn)
+		{
+			this.spawn = spawn;
 		}
-		return spawnCache = start = Bukkit.getWorld(world).getHighestBlockAt(start).getLocation();
+		
+		@Override
+		public Boolean call() throws Exception
+		{
+			return isSafeSpawn(new Location(Bukkit.getWorld(world), spawn.getX(), spawn.getY(), spawn.getZ()));
+		}
+		
 	}
 	
 	private List<Integer> unsafe = Arrays.asList(new Integer[]{0, 10, 11, 51});
