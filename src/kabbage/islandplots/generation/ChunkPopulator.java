@@ -81,6 +81,9 @@ public class ChunkPopulator
 		Bukkit.getScheduler().runTask(IslandPlots.instance, setBlocks);
 		while(!setBlocks.isDone) Thread.sleep(50l);
 		
+		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncLavaPopulate());
+		while(!isPopulateDone) Thread.sleep(50l);
+		
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(LakePopulator.class));
 		while(!isPopulateDone) Thread.sleep(50l);
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(GrassPopulator.class));
@@ -123,6 +126,17 @@ public class ChunkPopulator
 			{
 				e.printStackTrace();
 			}
+			isPopulateDone = true;
+		}
+	}
+	
+	class SyncLavaPopulate extends BukkitRunnable
+	{
+		@Override
+		public void run()
+		{
+			isPopulateDone = false;
+			new WorldGenLavaCustom().a(((CraftWorld) world).getHandle(), rnd, chunk.getX() + rnd.nextInt(16), rnd.nextInt(38) + 32, chunk.getZ() + rnd.nextInt(16));
 			isPopulateDone = true;
 		}
 	}

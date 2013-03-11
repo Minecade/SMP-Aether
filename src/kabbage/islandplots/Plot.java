@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import com.OverCaste.plugin.RedProtect.DefineRegionBuilder;
 import com.OverCaste.plugin.RedProtect.Region;
@@ -31,7 +33,7 @@ public class Plot implements Externalizable
 	private Island island;
 	private Region region;
 	private int level;
-	private int blockChanges;
+	private int wealth;
 	
 	/**
 	 * Empty constructor for externalization
@@ -46,7 +48,7 @@ public class Plot implements Externalizable
 		x = gridX;
 		y = gridY;
 		level = 0;
-		blockChanges = 0;
+		wealth = 0;
 		
 		Location topCorner = new Location(Bukkit.getWorld(world), getX() + PlotHandler.PLOT_SIZE / 2 - 1, 256, getZ() + PlotHandler.PLOT_SIZE / 2 - 1);
 		Location bottomCorner = new Location(Bukkit.getWorld(world), getX() - PlotHandler.PLOT_SIZE / 2, 0, getZ() - PlotHandler.PLOT_SIZE / 2);
@@ -126,20 +128,25 @@ public class Plot implements Externalizable
 		return region;
 	}
 	
-	public void registerBlockChange()
+	public void registerBlockChange(int type, boolean place)
 	{
-		blockChanges++;
-		if(blockChanges % 25 == 0)
+		wealth++;
+		if(wealth % 25 == 0)
 		{
-			if(level < 5)
+			if(level <= 3)
 			{
-				if(blockChanges >= 50*level*level + 25)
-					level++;
-			} else
-			{
-				
+				if(wealth >= 75*Math.pow(level, 1.5) + 35);
+					levelUp();
 			}
 		}
+	}
+
+	private void levelUp()
+	{
+		level++;
+		Player player = Bukkit.getPlayer(owner);
+		if(player != null)
+			player.sendMessage(ChatColor.GOLD+"Your plot, "+this+", has leveled up. It is now level "+level+"!");
 	}
 	
 	public String getOwner()
@@ -197,7 +204,7 @@ public class Plot implements Externalizable
 			y = in.readInt();
 			island = (Island) in.readObject();
 			level = in.readInt();
-			blockChanges = in.readInt();
+			wealth = in.readInt();
 		}
 		else
 			IslandPlots.log(Level.WARNING, "Unsupported version of a Plot failed to load.");
@@ -215,6 +222,6 @@ public class Plot implements Externalizable
 		out.writeInt(y);
 		out.writeObject(island);
 		out.writeInt(level);
-		out.writeInt(blockChanges);
+		out.writeInt(wealth);
 	}
 }

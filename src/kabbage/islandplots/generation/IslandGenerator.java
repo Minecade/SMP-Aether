@@ -53,20 +53,23 @@ public class IslandGenerator extends BukkitRunnable
 	{
 		try
 		{
-			runWithThrows();
+			runWithThrows(true);
+			runWithThrows(false);
 		} catch (InterruptedException e)
 		{
 			e.printStackTrace();
 		}
 	}
 	
-	public void runWithThrows() throws InterruptedException
+	public void runWithThrows(boolean first) throws InterruptedException
 	{
 		PerlinNoise noise = new PerlinNoise(seed, width << 4, length << 4);
 		Stack<Chunk> toPopulate = new Stack<Chunk>();
 		int doneSoFar = 0;
 		int todo = width * length;
 		int last = 0;
+		int aFrom = (first) ? (x >> 4) - (width >> 1) : 1;
+		int aTo = (first) ? 0 : (x >> 4) + (width >> 1);
 		for(int a = (x >> 4) - (width >> 1); a < (x >> 4) + (width >> 1); a++)
 		{
 			for(int b = (z >> 4) - (length >> 1); b < (z >> 4) + (length >> 1); b++)
@@ -128,7 +131,7 @@ public class IslandGenerator extends BukkitRunnable
 							if(sectionHeight - y <= 3)
 							{
 								if (biome == Biome.DESERT)
-									type = y == 0 ? (byte) 24 : (byte) 12;
+									type = sectionHeight - y == 3 ? (byte) 24 : (byte) 12;
 								else
 									type = sectionHeight - y == 0 ? (byte) 2 : (byte) 3;
 							}

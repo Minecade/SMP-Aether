@@ -28,19 +28,19 @@ public class BlockListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void registerBlockChange(BlockPlaceEvent event)
 	{
-		registerBlockChange(event.getBlock().getLocation());
+		registerBlockChange(event.getBlock().getLocation(), event.getBlock().getTypeId(), true);
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void registerBlockChange(BlockBreakEvent event)
 	{
-		registerBlockChange(event.getBlock().getLocation());
+		registerBlockChange(event.getBlock().getLocation(), event.getBlock().getTypeId(), false);
 	}
 	
-	private void registerBlockChange(Location location)
+	private void registerBlockChange(Location location, int type, boolean place)
 	{
 		Plot plot = plugin.getPlotHandler().getPlot(location);
 		if(plot != null)
-			plot.registerBlockChange();
+			plot.registerBlockChange(type, place);
 	}
 }
