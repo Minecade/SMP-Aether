@@ -4,6 +4,9 @@ import kabbage.islandplots.IslandPlots;
 import kabbage.islandplots.Plot;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -28,16 +31,19 @@ public class BlockListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void registerBlockChange(BlockPlaceEvent event)
 	{
-		registerBlockChange(event.getBlock().getLocation(), event.getBlock().getTypeId(), true);
+		registerBlockChange(event.getBlock().getLocation(), event.getBlock().getType(), true);
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void registerBlockChange(BlockBreakEvent event)
 	{
-		registerBlockChange(event.getBlock().getLocation(), event.getBlock().getTypeId(), false);
+		Block block = event.getBlock();
+		if(block.getType().name().contains("ORE") && event.getPlayer().getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH))
+			return;
+		registerBlockChange(block.getLocation(), block.getType(), false);
 	}
 	
-	private void registerBlockChange(Location location, int type, boolean place)
+	private void registerBlockChange(Location location, Material type, boolean place)
 	{
 		Plot plot = plugin.getPlotHandler().getPlot(location);
 		if(plot != null)

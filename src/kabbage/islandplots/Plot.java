@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import com.OverCaste.plugin.RedProtect.DefineRegionBuilder;
@@ -24,6 +27,48 @@ public class Plot implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
 	private static final int VERSION = 3;
+	
+	private static Map<Material, Integer> blockWorths;
+	private static Map<Material, Integer> blockBreakWorths;
+	
+	static
+	{
+		blockWorths = new HashMap<Material, Integer>();
+		blockBreakWorths = new HashMap<Material, Integer>();
+		
+		blockWorths.put(Material.REDSTONE_BLOCK, 50);
+		blockWorths.put(Material.IRON_BLOCK, 100);
+		blockWorths.put(Material.GOLD_BLOCK, 200);
+		blockWorths.put(Material.EMERALD_BLOCK, 400);
+		blockWorths.put(Material.DIAMOND_BLOCK, 750);
+		blockWorths.put(Material.COBBLESTONE, 4);
+		blockWorths.put(Material.COBBLESTONE_STAIRS, 4);
+		blockWorths.put(Material.SANDSTONE_STAIRS, 8);
+		blockWorths.put(Material.WOOD, 8);
+		blockWorths.put(Material.WOOD_STAIRS, 8);
+		blockWorths.put(Material.BOOKSHELF, 40);
+		blockWorths.put(Material.GLASS, 20);
+		blockWorths.put(Material.BRICK, 40);
+		blockWorths.put(Material.MOSSY_COBBLESTONE, 400);
+		blockWorths.put(Material.QUARTZ_BLOCK, 100);
+		blockWorths.put(Material.QUARTZ_STAIRS, 100);
+		blockWorths.put(Material.WOOL, 10);
+		
+		blockBreakWorths.put(Material.COAL_ORE, 10);
+		blockBreakWorths.put(Material.REDSTONE_ORE, 20);
+		blockBreakWorths.put(Material.IRON_ORE, 40);
+		blockBreakWorths.put(Material.QUARTZ_ORE, 40);
+		blockBreakWorths.put(Material.GOLD_ORE, 75);
+		blockBreakWorths.put(Material.EMERALD_ORE, 100);
+		blockBreakWorths.put(Material.DIAMOND_ORE, 200);
+		blockBreakWorths.put(Material.STONE, 1);
+		blockBreakWorths.put(Material.SAND, 1);
+		blockBreakWorths.put(Material.SANDSTONE, 2);
+		blockBreakWorths.put(Material.LOG, 3);
+		blockBreakWorths.put(Material.WHEAT, 5);
+		blockBreakWorths.put(Material.MELON_BLOCK, 10);
+		blockBreakWorths.put(Material.OBSIDIAN, 25);
+	}
 	
 	String world;
 	private String owner;
@@ -128,17 +173,21 @@ public class Plot implements Externalizable
 		return region;
 	}
 	
-	public void registerBlockChange(int type, boolean place)
+	public void registerBlockChange(Material type, boolean place)
 	{
-		wealth++;
-		if(wealth % 25 == 0)
+		if(place)
 		{
-			if(level <= 3)
-			{
-				if(wealth >= 75*Math.pow(level, 1.5) + 35);
-					levelUp();
-			}
+			if(blockWorths.containsKey(type))
+				wealth += blockWorths.get(type);
+		} else
+		{
+			if(blockBreakWorths.containsKey(type))
+				wealth += blockBreakWorths.get(type);
+			else if(blockWorths.containsKey(type))
+				wealth -= blockWorths.get(type);
 		}
+		if(wealth >= 200*Math.pow(level, 1.5) + 50)
+			levelUp();
 	}
 
 	private void levelUp()
