@@ -46,6 +46,8 @@ public class Island implements Externalizable
 	public void generate(String player)
 	{
 		IslandGenerator generator = new IslandGenerator(this, Bukkit.getWorld(world), x, y, z, CHUNK_WIDTH, CHUNK_LENGTH, HEIGHT, player);
+		// Run it twice because it is designed to be run in two asynchronous tasks. Weird, I know, but it runs too slowly otherwise
+		Bukkit.getScheduler().runTaskAsynchronously(IslandPlots.instance, generator);
 		Bukkit.getScheduler().runTaskAsynchronously(IslandPlots.instance, generator);
 	}
 	

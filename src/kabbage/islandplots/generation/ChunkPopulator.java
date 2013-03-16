@@ -4,14 +4,14 @@ import java.util.Random;
 
 import kabbage.islandplots.IslandPlots;
 
-import net.minecraft.server.v1_4_R1.ChunkSection;
-import net.minecraft.server.v1_4_R1.WorldGenCaves;
-import net.minecraft.server.v1_4_R1.WorldGenDungeons;
+import net.minecraft.server.v1_5_R1.ChunkSection;
+import net.minecraft.server.v1_5_R1.WorldGenCaves;
+import net.minecraft.server.v1_5_R1.WorldGenDungeons;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_5_R1.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -38,12 +38,13 @@ public class ChunkPopulator
 	
 	public void populate() throws InterruptedException
 	{
-		net.minecraft.server.v1_4_R1.World nmsWorld = ((CraftWorld) world).getHandle();
+		net.minecraft.server.v1_5_R1.World nmsWorld = ((CraftWorld) world).getHandle();
 		
 		WorldGenCaves caveGen = new WorldGenCaves();
 		byte[] blocks = new byte[32768];
 		for(int i = 0; i < blocks.length; i++) blocks[i] = 1;
-		caveGen.a(nmsWorld.chunkProvider, nmsWorld, chunk.getX(), chunk.getZ(), blocks);
+		for(int i = 0; i < 6; i++)
+			caveGen.a(nmsWorld.chunkProvider, nmsWorld, chunk.getX(), chunk.getZ(), blocks);
 		
 		byte[][] chunkBlocks = new byte[8][4096];
 		for (int x = 0; x < 16; ++x)
@@ -57,7 +58,7 @@ public class ChunkPopulator
 			}
 		}
 		
-		net.minecraft.server.v1_4_R1.Chunk nmsChunk = new net.minecraft.server.v1_4_R1.Chunk(nmsWorld, chunk.getX(), chunk.getZ());
+		net.minecraft.server.v1_5_R1.Chunk nmsChunk = new net.minecraft.server.v1_5_R1.Chunk(nmsWorld, chunk.getX(), chunk.getZ());
 		ChunkSection[] csect = nmsChunk.i();
 		for (int sec = 0; sec < chunkBlocks.length; sec++)
 		{
@@ -80,9 +81,6 @@ public class ChunkPopulator
 		IslandGenerator.SetSyncBlocks setBlocks = new IslandGenerator.SetSyncBlocks(chunk, bTypes);
 		Bukkit.getScheduler().runTask(IslandPlots.instance, setBlocks);
 		while(!setBlocks.isDone) Thread.sleep(50l);
-		
-		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncLavaPopulate());
-		while(!isPopulateDone) Thread.sleep(50l);
 		
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(LakePopulator.class));
 		while(!isPopulateDone) Thread.sleep(50l);
@@ -126,17 +124,6 @@ public class ChunkPopulator
 			{
 				e.printStackTrace();
 			}
-			isPopulateDone = true;
-		}
-	}
-	
-	class SyncLavaPopulate extends BukkitRunnable
-	{
-		@Override
-		public void run()
-		{
-			isPopulateDone = false;
-			new WorldGenLavaCustom().a(((CraftWorld) world).getHandle(), rnd, chunk.getX() + rnd.nextInt(16), rnd.nextInt(38) + 32, chunk.getZ() + rnd.nextInt(16));
 			isPopulateDone = true;
 		}
 	}

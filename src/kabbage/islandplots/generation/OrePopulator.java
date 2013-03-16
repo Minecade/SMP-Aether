@@ -68,8 +68,28 @@ public class OrePopulator extends BlockPopulator
 								//Don't let gravel hang out where it can fall
 								if(oreType == Material.GRAVEL && world.getBlockTypeIdAt(i3, i4 - 1, i5) != Material.STONE.getId())
 									continue;
-									
+								//Don't let lava be near the air at all
+								if(oreType == Material.LAVA)
+								{
+									if(world.getBlockTypeIdAt(i3, i4 - 1, i5) != Material.STONE.getId() ||
+											world.getBlockTypeIdAt(i3 - 1, i4, i5) != Material.STONE.getId() ||
+											world.getBlockTypeIdAt(i3 + 1, i4, i5) != Material.STONE.getId() ||
+											world.getBlockTypeIdAt(i3, i4, i5 - 1) != Material.STONE.getId() ||
+											world.getBlockTypeIdAt(i3, i4, i5 + 1) != Material.STONE.getId())
+										continue;
+									i3++;
+									i4++;
+									i5++;
+									if(world.getBlockTypeIdAt(i3, i4 - 1, i5) != Material.STONE.getId() ||
+											world.getBlockTypeIdAt(i3 - 1, i4, i5) != Material.STONE.getId() ||
+											world.getBlockTypeIdAt(i3 + 1, i4, i5) != Material.STONE.getId() ||
+											world.getBlockTypeIdAt(i3, i4, i5 - 1) != Material.STONE.getId() ||
+											world.getBlockTypeIdAt(i3, i4, i5 + 1) != Material.STONE.getId())
+										continue;
+								}
 								world.getBlockAt(i3, i4, i5).setType(oreType);
+								if(oreType == Material.LAVA)
+									world.getBlockAt(i3--, i4--, i5--).setType(oreType);
 							}
 						}
 					}
@@ -89,7 +109,7 @@ public class OrePopulator extends BlockPopulator
 		{
 			x = worldChunkX + this.random.nextInt(16);
 			z = worldChunkZ + this.random.nextInt(16);
-			y = 32 + this.random.nextInt(70) + 32;
+			y = this.random.nextInt(70) + 32;
 
 			this.createClump(world, Material.GRAVEL, 32, x, y, z);
 		}
@@ -98,7 +118,7 @@ public class OrePopulator extends BlockPopulator
 		{
 			x = worldChunkX + this.random.nextInt(16);
 			z = worldChunkZ + this.random.nextInt(16);
-			y = 32 + this.random.nextInt(70) + 32;
+			y = this.random.nextInt(70) + 32;
 
 			this.createClump(world, Material.COAL_ORE, 16, x, y, z);
 		}
@@ -107,7 +127,7 @@ public class OrePopulator extends BlockPopulator
 		{
 			x = worldChunkX + this.random.nextInt(16);
 			z = worldChunkZ + this.random.nextInt(16);
-			y = 32 + this.random.nextInt(48) + 32;
+			y = this.random.nextInt(48) + 32;
 
 			this.createClump(world, Material.IRON_ORE, 12, x, y, z);
 		}
@@ -116,7 +136,7 @@ public class OrePopulator extends BlockPopulator
 		{
 			x = worldChunkX + this.random.nextInt(16);
 			z = worldChunkZ + this.random.nextInt(16);
-			y = 32 + this.random.nextInt(38) + 32;
+			y = this.random.nextInt(38) + 32;
 
 			this.createClump(world, Material.GOLD_ORE, 8, x, y, z);
 		}
@@ -125,7 +145,7 @@ public class OrePopulator extends BlockPopulator
 		{
 			x = worldChunkX + this.random.nextInt(16);
 			z = worldChunkZ + this.random.nextInt(16);
-			y = 32 + this.random.nextInt(38) + 32;
+			y = this.random.nextInt(38) + 32;
 
 			this.createClump(world, Material.REDSTONE_ORE, 7, x, y, z);
 		}
@@ -143,9 +163,18 @@ public class OrePopulator extends BlockPopulator
 		{
 			x = worldChunkX + this.random.nextInt(16);
 			z = worldChunkZ + this.random.nextInt(16);
-			y = 32 + this.random.nextInt(70) + 32;
+			y = this.random.nextInt(70) + 32;
 
 			this.createClump(world, Material.LAPIS_ORE, 6, x, y, z);
+		}
+		
+		for (i = 0; i < 6; ++i)
+		{
+			x = worldChunkX + this.random.nextInt(16);
+			z = worldChunkZ + this.random.nextInt(16);
+			y = this.random.nextInt(38) + 32;
+
+			this.createClump(world, Material.LAVA, 32, x, y, z);
 		}
 	}
 

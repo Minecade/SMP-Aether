@@ -12,7 +12,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_4_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_5_R1.CraftChunk;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -31,6 +31,10 @@ public class IslandGenerator extends BukkitRunnable
 	long seed;
 	
 	String player;
+	
+	volatile int doneSoFar = 0;
+	
+	volatile boolean first = true;
 	
 	public IslandGenerator(Island island, org.bukkit.World world, int x, int y, int z, int width, int length, int height, String player)
 	{
@@ -53,34 +57,29 @@ public class IslandGenerator extends BukkitRunnable
 	{
 		try
 		{
-			runWithThrows(true);
-			runWithThrows(false);
+			runWithThrows();
 		} catch (InterruptedException e)
 		{
 			e.printStackTrace();
 		}
 	}
 	
-	public void runWithThrows(boolean first) throws InterruptedException
+	public void runWithThrows() throws InterruptedException
 	{
+		boolean first = this.first;
+		this.first = false;
 		PerlinNoise noise = new PerlinNoise(seed, width << 4, length << 4);
 		Stack<Chunk> toPopulate = new Stack<Chunk>();
-		int doneSoFar = 0;
-		int todo = width * length;
-		int last = 0;
-		int aFrom = (first) ? (x >> 4) - (width >> 1) : 1;
-		int aTo = (first) ? 0 : (x >> 4) + (width >> 1);
-		for(int a = (x >> 4) - (width >> 1); a < (x >> 4) + (width >> 1); a++)
+		int aFrom = (first) ? (x >> 4) - (width >> 1) : (x >> 4);
+		int aTo = (first) ? (x >> 4) : (x >> 4) + (width >> 1);
+		int bFrom = (z >> 4) - (length >> 1);
+		int bTo = (z >> 4) + (length >> 1);
+		if(!first)
+			Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Generating chunks..."));
+		for(int a = aFrom; a < aTo; a++)
 		{
-			for(int b = (z >> 4) - (length >> 1); b < (z >> 4) + (length >> 1); b++)
+			for(int b = bFrom; b < bTo; b++)
 			{
-				//Inform the player generating the island of progress
-				int percentDone = (int) ((++doneSoFar / (float) todo) * 100);
-				if(percentDone % 10 == 0 && percentDone != last)
-					Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Generating chunks: "+percentDone+"%..."));
-				last = percentDone;
-				
-				//Now actually do the generating
 				Future<Chunk> fChunk = Bukkit.getScheduler().callSyncMethod(IslandPlots.instance, new GetSyncChunk(a, b));
 				Chunk chunk;
 				try
@@ -118,7 +117,7 @@ public class IslandGenerator extends BukkitRunnable
 					{
 						int worldX = i + a * 16;
 						int worldZ = k + b * 16;
-						float noiseVal = (float) (noise.islandNoise(worldX - x, worldZ - z, 8, 0.45f) + .5);	//Add .5 to initial noise to increase volume
+						float noiseVal = (float) (noise.islandNoise(worldX - x, worldZ - z, 6, 0.45f) + .5);	//Add .5 to initial noise to increase volume
 						Biome biome = biomes[i][k];
 						boolean doBottom = false;
 						int sectionHeight = (int) (noiseVal * height);
@@ -140,8 +139,8 @@ public class IslandGenerator extends BukkitRunnable
 						if(doBottom)
 						{
 							int oppY = 0;
-							for(int o = 4; o < 6; o++) 	//When making the bottom half of the island, scew it so it doesn't look exactly like the top
-								noiseVal = noise.addOctave(worldX - x, worldZ - z, noiseVal, 0.45f, o);
+							//When making the bottom half of the island, scew it so it doesn't look exactly like the top
+							noiseVal = noise.addOctave(worldX - x, worldZ - z, noiseVal, 0.45f, 3);
 							sectionHeight *= 1.4;	//Make the bottom deeper than the top is high to make room for ores/caves
 							for(int y = 0; y <= sectionHeight; y++)
 								blocks[i][this.y + --oppY][k] = 1;
@@ -153,21 +152,17 @@ public class IslandGenerator extends BukkitRunnable
 				while(!setBlocks.isDone) Thread.sleep(50l);
 			}
 		}
-		doneSoFar = 0;
-		last = 0;
+		
+		if(!first)
+			Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Populating chunks..."));
 		for(Chunk chunk : toPopulate) 
-		{
-			//Inform the player populating the island of progress
-			int percentDone = (int) ((++doneSoFar / (float) todo) * 100);
-			if(percentDone % 10 == 0 && percentDone != last)
-				Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Populating chunks: "+percentDone+"%..."));
-			last = percentDone;
-
-			//Now actually populate the island
 			new ChunkPopulator(world, chunk, rnd, y).populate();
+		
+		if(!first)
+		{
+			Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Finding safe spawn point..."));
+			Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncTeleport());
 		}
-		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Finding safe spawn point..."));
-		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncTeleport());
 	}
 
 	class GetSyncChunk implements Callable<Chunk>
@@ -244,7 +239,7 @@ public class IslandGenerator extends BukkitRunnable
 	{
 		public volatile boolean isDone = false;
 		
-		net.minecraft.server.v1_4_R1.Chunk chunk;
+		net.minecraft.server.v1_5_R1.Chunk chunk;
 		byte[][][] blocks;
 		public SetSyncBlocks(Chunk chunk, byte[][][] blocks)
 		{
@@ -262,7 +257,7 @@ public class IslandGenerator extends BukkitRunnable
 					for(int k = 0; k < 16; k++)
 					{
 						if(blocks[i][j][k] != -1)
-							chunk.a(i, j, k, blocks[i][j][k]);
+							chunk.b(i, j, k, blocks[i][j][k]);
 					}
 				}
 			}
