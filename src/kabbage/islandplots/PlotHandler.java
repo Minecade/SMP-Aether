@@ -5,9 +5,14 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Stack;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import kabbage.islandplots.utils.Coordinate;
@@ -18,7 +23,7 @@ import com.google.common.collect.TreeBasedTable;
 public class PlotHandler implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
-	private static final int VERSION = 1;
+	private static final int VERSION = 2;
 	
 	static final int PLOT_SIZE = 300;
 	static final int PLOT_PADDING = 100;
@@ -28,13 +33,43 @@ public class PlotHandler implements Externalizable
 	private int currentRing;
 	private List<Coordinate> openPlots;	//List of plots opened up after having been removed
 	
+	private Map<Plot, Integer> toDeletion;	//Map of level 0 plots to their time until deleting (in minutes)
+	
 	/**
 	 * Empty constructor for externalization
 	 */
-	public PlotHandler() {}
+	public PlotHandler()
+	{
+		//Every minute, plots scheduled to be deleted are set one minute closer to being deleted. If they leveled up, proving they aren't
+		//inactive, they get removed from the map of plots to be deleted. If they are 0 minutes away from deletion, delete them.
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(IslandPlots.instance, new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Stack<Plot> toRemoveFromDelete = new Stack<Plot>();
+				Stack<Plot> toRemove = new Stack<Plot>();
+				for(Entry<Plot, Integer> e : toDeletion.entrySet())
+				{
+					if(e.getKey().getLevel() > 0)
+						toRemoveFromDelete.add(e.getKey());
+					else
+					{
+						e.setValue(e.getValue() - 1);
+						if(e.getValue() <= 0)
+							toRemove.add(e.getKey());
+					}
+					
+				}
+				for(Plot p : toRemoveFromDelete) toDeletion.remove(p);
+				for(Plot p : toRemove) removePlot(p);
+			}
+		},1200L, 1200L);
+	}
 	
 	public PlotHandler(String world)
 	{
+		this();
 		this.world = world;
 		plotGrid = TreeBasedTable.create();
 		currentRing = 0;
@@ -70,6 +105,7 @@ public class PlotHandler implements Externalizable
 		if(plot != null)
 		{
 			PlayerWrapper.getWrapper(owner).addPlot(plot);
+			toDeletion.put(plot, 1440);
 			return plot;
 		}
 		// All of the plots in the current ring must be filled. Go to the next ring and try again
@@ -140,6 +176,14 @@ public class PlotHandler implements Externalizable
 			currentRing = in.readInt();
 			plotGrid = (Table<Integer, Integer, Plot>) in.readObject();
 			openPlots = (List<Coordinate>) in.readObject();
+			toDeletion = new HashMap<Plot, Integer>();
+		} else if(ver == 2)
+		{
+			world = in.readUTF();
+			currentRing = in.readInt();
+			plotGrid = (Table<Integer, Integer, Plot>) in.readObject();
+			openPlots = (List<Coordinate>) in.readObject();
+			toDeletion = (Map<Plot, Integer>) in.readObject();
 		} else
 		{
 			IslandPlots.log(Level.WARNING, "Unsupported version of the PlotHandler failed to load.");
@@ -155,5 +199,6 @@ public class PlotHandler implements Externalizable
 		out.writeInt(currentRing);
 		out.writeObject(plotGrid);
 		out.writeObject(openPlots);
+		out.writeObject(toDeletion);
 	}
 }
