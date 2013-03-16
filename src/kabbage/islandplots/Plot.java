@@ -186,7 +186,7 @@ public class Plot implements Externalizable
 			else if(blockWorths.containsKey(type))
 				wealth -= blockWorths.get(type);
 		}
-		if(wealth >= 200*Math.pow(level, 1.5) + 50)
+		if(wealth >= 100*Math.pow(level, 1.5) + 50)
 			levelUp();
 	}
 

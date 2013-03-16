@@ -49,6 +49,9 @@ public class IslandPlotCommands implements CommandExecutor
 			case "info":
 				handler.sendInfo();
 				break;
+			case "makepermanent":
+				handler.makePermanent();
+				break;
 			default:
 				hardFailure = true;
 			}

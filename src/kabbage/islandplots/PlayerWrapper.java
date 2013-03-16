@@ -69,6 +69,11 @@ public class PlayerWrapper implements Externalizable
 		return plotsOwned.size();
 	}
 	
+	public void removePlot(Plot p)
+	{
+		plotsOwned.remove(p);
+	}
+	
 	public static PlayerWrapper getWrapper(String player)
 	{
 		PlayerWrapper wrapper = players.get(player);

@@ -91,4 +91,16 @@ public class CommandHandler
 			senderWrapper.sendMessage(ChatColor.GOLD+"Members: "+members.toString().replaceAll("]|[", ""));
 		senderWrapper.sendMessage(ChatColor.GOLD+"Level: "+plot.getLevel());
 	}
+
+	public void makePermanent()
+	{
+		Plot plot = plugin.getPlotHandler().getPlot(senderWrapper.getPlayer().getLocation());
+		if(plot == null)
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You are not currently in a plot to make permanent.");
+			return;
+		}
+		plugin.getPlotHandler().makePermanent(plot);
+		senderWrapper.sendMessage(ChatColor.GREEN+"Plot successfully made permanent.");
+	}
 }

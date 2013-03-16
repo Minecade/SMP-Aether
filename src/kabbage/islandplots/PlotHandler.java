@@ -51,7 +51,7 @@ public class PlotHandler implements Externalizable
 				Stack<Plot> toRemove = new Stack<Plot>();
 				for(Entry<Plot, Integer> e : toDeletion.entrySet())
 				{
-					if(e.getKey().getLevel() > 0)
+					if(e.getKey().getLevel() >= 2)
 						toRemoveFromDelete.add(e.getKey());
 					else
 					{
@@ -105,7 +105,7 @@ public class PlotHandler implements Externalizable
 		if(plot != null)
 		{
 			PlayerWrapper.getWrapper(owner).addPlot(plot);
-			toDeletion.put(plot, 1440);
+			toDeletion.put(plot, 1440 * 3);	//The plot has 3 days to reach level 2 before being deleted
 			return plot;
 		}
 		// All of the plots in the current ring must be filled. Go to the next ring and try again
@@ -118,6 +118,7 @@ public class PlotHandler implements Externalizable
 		IslandPlots.instance.getRedProtect().getGlobalRegionManager().remove(plot.getRegion());
 		openPlots.add(plot.getGridLocation());
 		plotGrid.remove(plot.getGridX(), plot.getGridX());
+		PlayerWrapper.getWrapper(plot.getOwner()).removePlot(plot);
 	}
 	
 	/**
@@ -163,6 +164,11 @@ public class PlotHandler implements Externalizable
 			ring.add(new Coordinate(-currentRing, y));
 		}
 		return ring;
+	}
+	
+	public void makePermanent(Plot p)
+	{
+		toDeletion.remove(p);
 	}
 	
 	@SuppressWarnings("unchecked")
