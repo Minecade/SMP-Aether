@@ -31,7 +31,7 @@ public class CommandHandler
 	{
 		if(!senderWrapper.isAdmin())
 			senderWrapper.sendMessage(ChatColor.RED+"You do not have permission to do this.");
-		Bukkit.dispatchCommand(senderWrapper.getSender(), "mv create "+worldName+" normal -g NullTerrain");
+		Bukkit.dispatchCommand(senderWrapper.getSender(), "mv create "+worldName+" normal -g IslandPlots");
 		plugin.setPlotHandler(new PlotHandler(worldName));
 	}
 	
@@ -40,7 +40,8 @@ public class CommandHandler
 		String playerName = senderWrapper.getPlayer().getName();
 		if(!PlayerWrapper.getWrapper(playerName).canHavePlot())
 		{
-			senderWrapper.sendMessage(ChatColor.RED+"You are not allowed to have another plot.");
+			senderWrapper.sendMessage(ChatColor.RED+"You are not allowed to have another plot. You must have a website account, your last created plot must" +
+					"be level 3 or higher, and you may not have more than 5 plots.");
 			return;
 		}
 		plugin.getPlotHandler().appendPlot(playerName);

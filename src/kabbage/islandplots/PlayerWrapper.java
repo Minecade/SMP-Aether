@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import kabbage.islandplots.utils.Utils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -48,8 +50,17 @@ public class PlayerWrapper implements Externalizable
 	
 	public boolean canHavePlot()
 	{
-		//TODO
-		return true;
+		int size = plotsOwned.size();
+		if(size == 0)
+			return true;
+		if(size > 5)
+			return false;
+		if(!Utils.hasWebsiteAccount(playerName))
+			return false;
+		Plot lastPlot = plotsOwned.get(size - 1);
+		if(lastPlot.getLevel() >= 3)
+			return true;
+		return false;
 	}
 	
 	public Player getPlayer()

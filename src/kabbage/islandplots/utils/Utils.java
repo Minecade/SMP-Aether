@@ -35,4 +35,14 @@ public class Utils
 			return defaultValue;
 		}
 	}
+	
+	/**
+	 * Determines whether or not the player has a website account.
+	 * @param playerName	name of the player
+	 * @return				true if player has account, else false
+	 */
+	public static boolean hasWebsiteAccount(String playerName)
+	{
+		return true;	//TODO
+	}
 }

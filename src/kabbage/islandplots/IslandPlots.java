@@ -16,7 +16,10 @@ import kabbage.islandplots.listeners.PlayerListener;
 import kabbage.islandplots.listeners.WorldListener;
 import kabbage.islandplots.utils.Constants;
 
+import kabbage.islandplots.generation.NullChunkGenerator;
+
 import org.bukkit.Bukkit;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -179,6 +182,11 @@ public class IslandPlots extends JavaPlugin
 	public void setPlotHandler(PlotHandler plotHandler)
 	{
 		this.plotHandler = plotHandler;
+	}
+	
+	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
+	{
+		return new NullChunkGenerator();
 	}
 	
 	public static void log(Level level, String log)

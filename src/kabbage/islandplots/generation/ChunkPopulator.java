@@ -43,7 +43,7 @@ public class ChunkPopulator
 		WorldGenCaves caveGen = new WorldGenCaves();
 		byte[] blocks = new byte[32768];
 		for(int i = 0; i < blocks.length; i++) blocks[i] = 1;
-		for(int i = 0; i < 6; i++)
+		for(int i = 0; i < 8; i++)	//Caves don't generate often enough if we only run it once
 			caveGen.a(nmsWorld.chunkProvider, nmsWorld, chunk.getX(), chunk.getZ(), blocks);
 		
 		byte[][] chunkBlocks = new byte[8][4096];
