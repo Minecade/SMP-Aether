@@ -74,7 +74,7 @@ public class ChunkPopulator
 				for(int k = 0; k < 16; k++)
 				{
 					byte type = (byte) nmsChunk.getTypeId(i, j, k);
-					bTypes[i][j][k] = (byte) ((type == 0 && j < islandHeight + 1) ? 0 : -1);
+					bTypes[i][j][k] = (byte) ((type == 0 && j < islandHeight) ? 0 : -1);
 				}
 			}
 		}

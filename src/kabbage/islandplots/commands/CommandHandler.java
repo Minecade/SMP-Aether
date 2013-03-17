@@ -91,6 +91,7 @@ public class CommandHandler
 		if(members.size() > 0)
 			senderWrapper.sendMessage(ChatColor.GOLD+"Members: "+members.toString().replaceAll("]|[", ""));
 		senderWrapper.sendMessage(ChatColor.GOLD+"Level: "+plot.getLevel());
+		senderWrapper.sendMessage(ChatColor.GOLD+"Wealth: "+plot.getWealth()+"/"+plot.getNextWealth());
 	}
 
 	public void makePermanent()

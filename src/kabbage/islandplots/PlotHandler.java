@@ -74,6 +74,7 @@ public class PlotHandler implements Externalizable
 		plotGrid = TreeBasedTable.create();
 		currentRing = 0;
 		openPlots = new ArrayList<Coordinate>();
+		toDeletion = new HashMap<Plot, Integer>();
 	}
 	
 	/**

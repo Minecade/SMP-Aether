@@ -3,6 +3,7 @@ main: kabbage.islandplots.IslandPlots
 author: kabbage
 version: 0.1
 depend: [Multiverse-Core, redProtect]
+load: STARTUP
 commands:
     island:
         description: The plugins basic command.

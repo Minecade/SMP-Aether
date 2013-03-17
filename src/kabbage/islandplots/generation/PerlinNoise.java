@@ -152,8 +152,8 @@ public class PerlinNoise
 	{
 		float noise = perlinNoise(x, z, octaves, persistence);
 		float distFromCenterNormalized = (float) Math.sqrt(Math.pow(x / (width), 2) + Math.pow(z / (height), 2));
-		if(distFromCenterNormalized < .2)	//Make the center more mountainy
-			noise += .1 - distFromCenterNormalized / 2;
+		if(distFromCenterNormalized < .15)	//Make the center more mountainy
+			noise += .15 - distFromCenterNormalized;
 		distFromCenterNormalized = (float) Math.pow(distFromCenterNormalized, .75);	//Makes the effect increase much more as you get further away from center
 		noise -= distFromCenterNormalized * 1.5;
 		return noise;

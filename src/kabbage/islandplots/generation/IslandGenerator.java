@@ -5,6 +5,7 @@ import java.util.Stack;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import kabbage.islandplots.Island;
 import kabbage.islandplots.IslandPlots;
 
 import org.bukkit.Bukkit;
@@ -117,7 +118,7 @@ public class IslandGenerator extends BukkitRunnable
 					{
 						int worldX = i + a * 16;
 						int worldZ = k + b * 16;
-						float noiseVal = (float) (noise.islandNoise(worldX - x, worldZ - z, 6, 0.45f) + .5);	//Add .5 to initial noise to increase volume
+						float noiseVal = (float) (noise.islandNoise(worldX - x, worldZ - z, 5, 0.35f) + .5);	//Add .5 to initial noise to increase volume
 						Biome biome = biomes[i][k];
 						boolean doBottom = false;
 						int sectionHeight = (int) (noiseVal * height);
@@ -141,7 +142,8 @@ public class IslandGenerator extends BukkitRunnable
 							int oppY = 0;
 							//When making the bottom half of the island, scew it so it doesn't look exactly like the top
 							noiseVal = noise.addOctave(worldX - x, worldZ - z, noiseVal, 0.45f, 3);
-							sectionHeight *= 1.4;	//Make the bottom deeper than the top is high to make room for ores/caves
+							sectionHeight = (int) (noiseVal * height * 2.5);	//Make the bottom deeper than the top is high to make room for ores/caves
+							sectionHeight += rnd.nextInt(2);
 							for(int y = 0; y <= sectionHeight; y++)
 								blocks[i][this.y + --oppY][k] = 1;
 						}
@@ -257,7 +259,7 @@ public class IslandGenerator extends BukkitRunnable
 					for(int k = 0; k < 16; k++)
 					{
 						if(blocks[i][j][k] != -1)
-							chunk.b(i, j, k, blocks[i][j][k]);
+							chunk.a(i, j, k, blocks[i][j][k], 0);
 					}
 				}
 			}

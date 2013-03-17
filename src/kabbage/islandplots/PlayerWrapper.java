@@ -54,13 +54,13 @@ public class PlayerWrapper implements Externalizable
 		if(size == 0)
 			return true;
 		if(size > 5)
-			return false;
+			return true;	//TODO change to return false
 		if(!Utils.hasWebsiteAccount(playerName))
 			return false;
 		Plot lastPlot = plotsOwned.get(size - 1);
 		if(lastPlot.getLevel() >= 3)
 			return true;
-		return false;
+		return true;	//TODO change to return false
 	}
 	
 	public Player getPlayer()

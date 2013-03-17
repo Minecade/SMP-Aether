@@ -20,7 +20,6 @@ import com.OverCaste.plugin.RedProtect.DefineRegionBuilder;
 import com.OverCaste.plugin.RedProtect.Region;
 import com.OverCaste.plugin.RedProtect.RegionBuilder;
 
-import kabbage.islandplots.generation.Island;
 import kabbage.islandplots.utils.Coordinate;
 
 public class Plot implements Externalizable
@@ -49,7 +48,6 @@ public class Plot implements Externalizable
 		blockWorths.put(Material.BOOKSHELF, 40);
 		blockWorths.put(Material.GLASS, 20);
 		blockWorths.put(Material.BRICK, 40);
-		blockWorths.put(Material.MOSSY_COBBLESTONE, 400);
 		blockWorths.put(Material.QUARTZ_BLOCK, 100);
 		blockWorths.put(Material.QUARTZ_STAIRS, 100);
 		blockWorths.put(Material.WOOL, 10);
@@ -186,7 +184,7 @@ public class Plot implements Externalizable
 			else if(blockWorths.containsKey(type))
 				wealth -= blockWorths.get(type);
 		}
-		if(wealth >= 100*Math.pow(level, 1.5) + 50)
+		if(wealth >= getNextWealth())
 			levelUp();
 	}
 
@@ -196,6 +194,16 @@ public class Plot implements Externalizable
 		Player player = Bukkit.getPlayer(owner);
 		if(player != null)
 			player.sendMessage(ChatColor.GOLD+"Your plot, "+this+", has leveled up. It is now level "+level+"!");
+	}
+	
+	public int getWealth()
+	{
+		return wealth;
+	}
+	
+	public int getNextWealth()
+	{
+		return (int) (100*Math.pow(level, 1.5) + 50);
 	}
 	
 	public String getOwner()
