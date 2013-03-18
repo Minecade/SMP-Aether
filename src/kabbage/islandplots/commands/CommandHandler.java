@@ -6,6 +6,7 @@ import kabbage.islandplots.IslandPlots;
 import kabbage.islandplots.PlayerWrapper;
 import kabbage.islandplots.Plot;
 import kabbage.islandplots.PlotHandler;
+import kabbage.islandplots.utils.Permissions;
 import kabbage.islandplots.utils.Utils;
 
 import org.bukkit.Bukkit;
@@ -27,9 +28,35 @@ public class CommandHandler
 		this.command = command;
 	}
 	
+	public void abandonPlot()
+	{
+		Player player = senderWrapper.getPlayer();
+		Plot plot = plugin.getPlotHandler().getPlot(player.getLocation());
+		if(plot == null)
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You are not currently in a plot to remove.");
+			return;
+		}
+		if(plugin.getPlotHandler().needConfirmationUntiDeletion.contains(plot))
+		{
+			plugin.getPlotHandler().removePlot(plot);
+			Plot defaultP = PlayerWrapper.getWrapper(player).getPlot(0);
+			if(defaultP != null)
+				player.teleport(defaultP.getSpawnPoint());
+			else
+				player.teleport(player.getWorld().getSpawnLocation());
+			senderWrapper.sendMessage(ChatColor.RED+"Plot abandoned.");
+		} else
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"Are you absolutely positive you wish to abandon this plot? The action is irreversible.");
+			senderWrapper.sendMessage(ChatColor.RED+"Type the command a second time to confirm.");
+			plugin.getPlotHandler().needConfirmationUntiDeletion.add(plot);
+		}
+	}
+	
 	public void createIslandWorld(String worldName)
 	{
-		if(!senderWrapper.isAdmin())
+		if(!Permissions.isAdmin(senderWrapper.getSender()))
 			senderWrapper.sendMessage(ChatColor.RED+"You do not have permission to do this.");
 		Bukkit.dispatchCommand(senderWrapper.getSender(), "mv create "+worldName+" normal -g IslandPlots");
 		plugin.setPlotHandler(new PlotHandler(worldName));
@@ -40,30 +67,17 @@ public class CommandHandler
 		String playerName = senderWrapper.getPlayer().getName();
 		if(!PlayerWrapper.getWrapper(playerName).canHavePlot())
 		{
+			int maxPlots = Permissions.maxPlots(senderWrapper.getPlayer());
 			senderWrapper.sendMessage(ChatColor.RED+"You are not allowed to have another plot. You must have a website account, your last created plot must" +
-					"be level 3 or higher, and you may not have more than 5 plots.");
+					"be level 3 or higher, and you may not have more than "+maxPlots+" plot(s).");
 			return;
 		}
 		plugin.getPlotHandler().appendPlot(playerName);
 	}
-
-	public void teleportHome()
-	{
-		int homeID = (command.hasArgAtIndex(2)) ? Utils.parseInt(command.getArgAtIndex(2), 1) : 1;
-		Player player = senderWrapper.getPlayer();
-		PlayerWrapper playerW = PlayerWrapper.getWrapper(senderWrapper.getPlayer());
-		Plot plot = playerW.getPlot(homeID - 1);
-		if(plot == null)
-		{
-			senderWrapper.sendMessage(ChatColor.RED+"Specified plot could not be found.");
-			return;
-		}
-		player.teleport(plot.getIsland().getSpawnPoint());
-	}
 	
 	public void listHomes()
 	{
-		int page = (command.hasArgAtIndex(2)) ? Utils.parseInt(command.getArgAtIndex(2), 1) : 1;
+		int page = (command.hasArgAtIndex(2)) ? Utils.parseInt(command.getArgAtIndex(2), 0)-1 : 0;
 		PlayerWrapper playerW = PlayerWrapper.getWrapper(senderWrapper.getPlayer());
 		senderWrapper.sendMessage(ChatColor.GOLD+"Owned Island Plots:");
 		for(int i = page * 10; i < page * 10 + 10; i++)
@@ -75,6 +89,18 @@ public class CommandHandler
 			senderWrapper.sendMessage(String.format("%sPlot %d: %s[%d, %d]", ChatColor.DARK_AQUA, i+1, ChatColor.DARK_GRAY, p.getGridX(), p.getGridY()));
 		}
 		senderWrapper.sendMessage(String.format("Page %d/%d", page, playerW.getPlots() / 10));
+	}
+	
+	public void makePermanent()
+	{
+		Plot plot = plugin.getPlotHandler().getPlot(senderWrapper.getPlayer().getLocation());
+		if(plot == null)
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You are not currently in a plot to make permanent.");
+			return;
+		}
+		plugin.getPlotHandler().makePermanent(plot);
+		senderWrapper.sendMessage(ChatColor.GREEN+"Plot successfully made permanent.");
 	}
 
 	public void sendInfo()
@@ -93,16 +119,18 @@ public class CommandHandler
 		senderWrapper.sendMessage(ChatColor.GOLD+"Level: "+plot.getLevel());
 		senderWrapper.sendMessage(ChatColor.GOLD+"Wealth: "+plot.getWealth()+"/"+plot.getNextWealth());
 	}
-
-	public void makePermanent()
+	
+	public void teleportHome()
 	{
-		Plot plot = plugin.getPlotHandler().getPlot(senderWrapper.getPlayer().getLocation());
+		int homeID = (command.hasArgAtIndex(2)) ? Utils.parseInt(command.getArgAtIndex(2), 1) : 1;
+		Player player = senderWrapper.getPlayer();
+		PlayerWrapper playerW = PlayerWrapper.getWrapper(senderWrapper.getPlayer());
+		Plot plot = playerW.getPlot(homeID - 1);
 		if(plot == null)
 		{
-			senderWrapper.sendMessage(ChatColor.RED+"You are not currently in a plot to make permanent.");
+			senderWrapper.sendMessage(ChatColor.RED+"Specified plot could not be found.");
 			return;
 		}
-		plugin.getPlotHandler().makePermanent(plot);
-		senderWrapper.sendMessage(ChatColor.GREEN+"Plot successfully made permanent.");
+		player.teleport(plot.getIsland().getSpawnPoint());
 	}
 }

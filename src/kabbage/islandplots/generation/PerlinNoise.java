@@ -155,7 +155,7 @@ public class PerlinNoise
 		if(distFromCenterNormalized < .15)	//Make the center more mountainy
 			noise += .15 - distFromCenterNormalized;
 		distFromCenterNormalized = (float) Math.pow(distFromCenterNormalized, .75);	//Makes the effect increase much more as you get further away from center
-		noise -= distFromCenterNormalized * 1.5;
+		noise -= distFromCenterNormalized * 1.6;
 		return noise;
 	}
 }

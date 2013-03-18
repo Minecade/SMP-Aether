@@ -35,6 +35,10 @@ public class PlotHandler implements Externalizable
 	
 	private Map<Plot, Integer> toDeletion;	//Map of level 0 plots to their time until deleting (in minutes)
 	
+	//List of plots people have tried to delete, but they still need to type the command a second time to confirm the deletion.
+	//Periodically cleared
+	public transient List<Plot> needConfirmationUntiDeletion = new ArrayList<Plot>();
+	
 	/**
 	 * Empty constructor for externalization
 	 */
@@ -63,6 +67,7 @@ public class PlotHandler implements Externalizable
 				}
 				for(Plot p : toRemoveFromDelete) toDeletion.remove(p);
 				for(Plot p : toRemove) removePlot(p);
+				needConfirmationUntiDeletion.clear();
 			}
 		},1200L, 1200L);
 	}

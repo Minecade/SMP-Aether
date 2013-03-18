@@ -40,11 +40,10 @@ public class ChunkPopulator
 	{
 		net.minecraft.server.v1_5_R1.World nmsWorld = ((CraftWorld) world).getHandle();
 		
-		WorldGenCaves caveGen = new WorldGenCaves();
 		byte[] blocks = new byte[32768];
 		for(int i = 0; i < blocks.length; i++) blocks[i] = 1;
-		for(int i = 0; i < 8; i++)	//Caves don't generate often enough if we only run it once
-			caveGen.a(nmsWorld.chunkProvider, nmsWorld, chunk.getX(), chunk.getZ(), blocks);
+		for(int i = 0; i < 12; i++)	//Caves don't generate often enough if we only run it once
+			new WorldGenCaves().a(nmsWorld.chunkProvider, nmsWorld, chunk.getX() + i * 16, chunk.getZ() + i * 16, blocks);
 		
 		byte[][] chunkBlocks = new byte[8][4096];
 		for (int x = 0; x < 16; ++x)
@@ -74,7 +73,7 @@ public class ChunkPopulator
 				for(int k = 0; k < 16; k++)
 				{
 					byte type = (byte) nmsChunk.getTypeId(i, j, k);
-					bTypes[i][j][k] = (byte) ((type == 0 && j < islandHeight) ? 0 : -1);
+					bTypes[i][j][k] = (byte) ((type == 0 && j < islandHeight - 2) ? 0 : -1);
 				}
 			}
 		}

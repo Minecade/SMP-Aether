@@ -94,7 +94,6 @@ public class IslandGenerator extends BukkitRunnable
 					doneSoFar--;
 					continue;
 				}
-				chunk.load();
 				toPopulate.add(chunk);
 				
 				Biome[][] biomes;
@@ -142,7 +141,7 @@ public class IslandGenerator extends BukkitRunnable
 							int oppY = 0;
 							//When making the bottom half of the island, scew it so it doesn't look exactly like the top
 							noiseVal = noise.addOctave(worldX - x, worldZ - z, noiseVal, 0.45f, 3);
-							sectionHeight = (int) (noiseVal * height * 2.5);	//Make the bottom deeper than the top is high to make room for ores/caves
+							sectionHeight = (int) (noiseVal * height * 2.25);	//Make the bottom deeper than the top is high to make room for ores/caves
 							sectionHeight += rnd.nextInt(2);
 							for(int y = 0; y <= sectionHeight; y++)
 								blocks[i][this.y + --oppY][k] = 1;

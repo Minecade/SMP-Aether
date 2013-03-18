@@ -6,13 +6,6 @@ import org.bukkit.plugin.PluginManager;
 
 public class WorldListener implements Listener
 {
-	private IslandPlots plugin;
-
-	public WorldListener()
-	{
-		plugin = IslandPlots.instance;
-	}
-
 	public void registerEvents(PluginManager pm, IslandPlots plugin)
 	{
 		pm.registerEvents(this, plugin);

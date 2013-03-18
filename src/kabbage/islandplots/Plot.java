@@ -171,6 +171,11 @@ public class Plot implements Externalizable
 		return region;
 	}
 	
+	public Location getSpawnPoint()
+	{
+		return island.getSpawnPoint();
+	}
+	
 	public void registerBlockChange(Material type, boolean place)
 	{
 		if(place)
@@ -203,7 +208,7 @@ public class Plot implements Externalizable
 	
 	public int getNextWealth()
 	{
-		return (int) (100*Math.pow(level, 1.5) + 50);
+		return (int) (100*Math.pow(level, 2) + 50);
 	}
 	
 	public String getOwner()

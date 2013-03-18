@@ -1,5 +1,8 @@
 package kabbage.islandplots.utils;
 
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginManager;
 
@@ -10,9 +13,9 @@ public enum Permissions
      */
     ADMIN,
     /**
-     * Players who have extended permissions from a normal user
+     * Players who have permission for extra plots (5 specifically, as opposed to the default 2)
      */
-    VIP;
+    EXTRAPLOTS;
     
     @Override
     public String toString()
@@ -21,8 +24,8 @@ public enum Permissions
         {
             case ADMIN:
                 return "island.admin";
-            case VIP:
-                return "island.vip";
+            case EXTRAPLOTS:
+                return "island.extraplots";
             default:
             	return null;
         }
@@ -36,10 +39,40 @@ public enum Permissions
         try
         {
             pm.addPermission(new Permission(ADMIN.toString()));
-            pm.addPermission(new Permission(VIP.toString()));
+            pm.addPermission(new Permission(EXTRAPLOTS.toString()));
         } catch (Exception e)
         {
         }
 
+    }
+    
+    public static boolean isAdmin(Player player)
+    {
+    	return hasExternalPermissions(player, Permissions.ADMIN.toString(), true);
+    }
+    
+    public static int maxPlots(Player player)
+    {
+    	return hasExternalPermissions(player, Permissions.EXTRAPLOTS.toString(), true) || isAdmin(player) ? 5 : 2;
+    }
+    
+    public static boolean hasExternalPermissions(Player player, String node, boolean countOp)
+    {
+        return (player.isOp() && countOp) || player.hasPermission(node);
+    }
+    
+    public static boolean isAdmin(CommandSender sender)
+    {
+    	return hasExternalPermissions(sender, Permissions.ADMIN.toString(), true);
+    }
+    
+    public static int maxPlots(CommandSender sender)
+    {
+    	return hasExternalPermissions(sender, Permissions.EXTRAPLOTS.toString(), true) || isAdmin(sender) ? 5 : 2;
+    }
+    
+    public static boolean hasExternalPermissions(CommandSender sender, String node, boolean countOp)
+    {
+        return (sender instanceof ConsoleCommandSender) || (sender.isOp() && countOp) || sender.hasPermission(node);
     }
 }

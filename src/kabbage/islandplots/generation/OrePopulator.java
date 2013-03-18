@@ -77,19 +77,8 @@ public class OrePopulator extends BlockPopulator
 											world.getBlockTypeIdAt(i3, i4, i5 - 1) != Material.STONE.getId() ||
 											world.getBlockTypeIdAt(i3, i4, i5 + 1) != Material.STONE.getId())
 										continue;
-									i3++;
-									i4++;
-									i5++;
-									if(world.getBlockTypeIdAt(i3, i4 - 1, i5) != Material.STONE.getId() ||
-											world.getBlockTypeIdAt(i3 - 1, i4, i5) != Material.STONE.getId() ||
-											world.getBlockTypeIdAt(i3 + 1, i4, i5) != Material.STONE.getId() ||
-											world.getBlockTypeIdAt(i3, i4, i5 - 1) != Material.STONE.getId() ||
-											world.getBlockTypeIdAt(i3, i4, i5 + 1) != Material.STONE.getId())
-										continue;
 								}
 								world.getBlockAt(i3, i4, i5).setType(oreType);
-								if(oreType == Material.LAVA)
-									world.getBlockAt(i3--, i4--, i5--).setType(oreType);
 							}
 						}
 					}
@@ -120,7 +109,7 @@ public class OrePopulator extends BlockPopulator
 			z = worldChunkZ + this.random.nextInt(16);
 			y = this.random.nextInt(70) + 32;
 
-			this.createClump(world, Material.COAL_ORE, 16, x, y, z);
+			this.createClump(world, Material.COAL_ORE, 10, x, y, z);
 		}
 
 		for (i = 0; i < 12; ++i)
@@ -129,7 +118,7 @@ public class OrePopulator extends BlockPopulator
 			z = worldChunkZ + this.random.nextInt(16);
 			y = this.random.nextInt(48) + 32;
 
-			this.createClump(world, Material.IRON_ORE, 12, x, y, z);
+			this.createClump(world, Material.IRON_ORE, 8, x, y, z);
 		}
 
 		for (i = 0; i < 6; ++i)
@@ -138,7 +127,7 @@ public class OrePopulator extends BlockPopulator
 			z = worldChunkZ + this.random.nextInt(16);
 			y = this.random.nextInt(38) + 32;
 
-			this.createClump(world, Material.GOLD_ORE, 8, x, y, z);
+			this.createClump(world, Material.GOLD_ORE, 7, x, y, z);
 		}
 
 		for (i = 0; i < 8; ++i)
@@ -156,7 +145,7 @@ public class OrePopulator extends BlockPopulator
 			z = worldChunkZ + this.random.nextInt(16);
 			y = this.random.nextInt(32) + 32;
 
-			this.createClump(world, Material.DIAMOND_ORE, 7, x, y, z);
+			this.createClump(world, Material.DIAMOND_ORE, 6, x, y, z);
 		}
 
 		for (i = 0; i < 4; ++i)

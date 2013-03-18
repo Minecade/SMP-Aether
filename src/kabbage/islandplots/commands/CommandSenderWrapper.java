@@ -1,7 +1,5 @@
 package kabbage.islandplots.commands;
 
-import kabbage.islandplots.utils.Permissions;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -45,30 +43,6 @@ public class CommandSenderWrapper
     public CommandSender getSender()
     {
         return sender;
-    }
-
-    //**************************************************************************
-    //PERMISSIONS-RELATED METHODS
-    //**************************************************************************
-    
-    public boolean isAdmin()
-    {
-    	return hasExternalPermissions(Permissions.ADMIN.toString(), true);
-    }
-    
-    public boolean isVIP()
-    {
-    	return hasExternalPermissions(Permissions.VIP.toString(), true) || isAdmin();
-    }
-    
-    /**
-     *
-     * @param node
-     * @return
-     */
-    public boolean hasExternalPermissions(String node, boolean countOp)
-    {
-        return (!(this.getSender() instanceof Player)) || (this.getSender().isOp() && countOp) || this.getSender().hasPermission(node);
     }
 
     /**

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import kabbage.islandplots.utils.Permissions;
 import kabbage.islandplots.utils.Utils;
 
 import org.bukkit.Bukkit;
@@ -53,7 +54,7 @@ public class PlayerWrapper implements Externalizable
 		int size = plotsOwned.size();
 		if(size == 0)
 			return true;
-		if(size > 5)
+		if(size > Permissions.maxPlots(getPlayer()))
 			return true;	//TODO change to return false
 		if(!Utils.hasWebsiteAccount(playerName))
 			return false;
