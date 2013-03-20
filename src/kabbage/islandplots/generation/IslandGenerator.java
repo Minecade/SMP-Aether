@@ -33,8 +33,6 @@ public class IslandGenerator extends BukkitRunnable
 	
 	String player;
 	
-	volatile boolean first = true;
-	
 	public IslandGenerator(Island island, org.bukkit.World world, int x, int y, int z, int width, int length, int height, String player)
 	{
 		this.island = island;
@@ -65,16 +63,13 @@ public class IslandGenerator extends BukkitRunnable
 	
 	public void runWithThrows() throws InterruptedException
 	{
-		boolean first = this.first;
-		this.first = false;
 		PerlinNoise noise = new PerlinNoise(seed, width << 4, length << 4);
 		Stack<Chunk> toPopulate = new Stack<Chunk>();
-		int aFrom = (first) ? (x >> 4) - (width >> 1) : (x >> 4);
-		int aTo = (first) ? (x >> 4) : (x >> 4) + (width >> 1);
+		int aFrom = (x >> 4) - (width >> 1);
+		int aTo = (x >> 4) + (width >> 1);
 		int bFrom = (z >> 4) - (length >> 1);
 		int bTo = (z >> 4) + (length >> 1);
-		if(!first)
-			Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Generating chunks..."));
+		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Generating chunks..."));
 		for(int a = aFrom; a < aTo; a++)
 		{
 			for(int b = bFrom; b < bTo; b++)
@@ -150,16 +145,12 @@ public class IslandGenerator extends BukkitRunnable
 			}
 		}
 		
-		if(!first)
-			Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Populating chunks..."));
+		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Populating chunks..."));
 		for(Chunk chunk : toPopulate) 
 			new ChunkPopulator(world, chunk, rnd, y).populate();
 		
-		if(!first)
-		{
-			Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Finding safe spawn point..."));
-			Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncTeleport());
-		}
+		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Finding safe spawn point..."));
+		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncTeleport());
 	}
 
 	class GetSyncChunk implements Callable<Chunk>
