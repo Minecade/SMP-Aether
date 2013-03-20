@@ -33,8 +33,6 @@ public class IslandGenerator extends BukkitRunnable
 	
 	String player;
 	
-	volatile int doneSoFar = 0;
-	
 	volatile boolean first = true;
 	
 	public IslandGenerator(Island island, org.bukkit.World world, int x, int y, int z, int width, int length, int height, String player)
@@ -91,7 +89,6 @@ public class IslandGenerator extends BukkitRunnable
 					e.printStackTrace();
 					//Retry
 					b--;
-					doneSoFar--;
 					continue;
 				}
 				toPopulate.add(chunk);
@@ -107,7 +104,6 @@ public class IslandGenerator extends BukkitRunnable
 					//Retry
 					toPopulate.remove(chunk);
 					b--;
-					doneSoFar--;
 					continue;
 				}
 				byte[][][] blocks = new byte[16][128][16];

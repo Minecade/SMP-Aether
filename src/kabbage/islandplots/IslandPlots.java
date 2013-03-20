@@ -11,14 +11,13 @@ import java.util.logging.Level;
 
 import kabbage.islandplots.commands.IslandPlotCommands;
 import kabbage.islandplots.listeners.BlockListener;
-import kabbage.islandplots.listeners.EntityListener;
 import kabbage.islandplots.listeners.PlayerListener;
-import kabbage.islandplots.listeners.WorldListener;
 import kabbage.islandplots.utils.Constants;
 
 import kabbage.islandplots.generation.NullChunkGenerator;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,15 +35,16 @@ public class IslandPlots extends JavaPlugin
 	
 	private IslandPlotCommands ipCommands;
 	//Listeners
-	private EntityListener eListener;
 	private PlayerListener pListener;
-	private WorldListener wListener;
 	private BlockListener bListener;
 	
 	@Override
 	public void onEnable()
 	{
 		instance = this;
+		
+		loadConfiguration();
+		loadDefaults();
 		
 		ipCommands = new IslandPlotCommands();
 		getCommand("island").setExecutor(ipCommands);
@@ -53,13 +53,9 @@ public class IslandPlots extends JavaPlugin
 		multiverse = (MultiverseCore) pm.getPlugin("MultiverseCore");
 		redProtect = (RedProtect) pm.getPlugin("redProtect");
 		//Register listeners
-		eListener = new EntityListener();
 		pListener = new PlayerListener();
-		wListener = new WorldListener();
 		bListener = new BlockListener();			
-		eListener.registerEvents(pm, this);
 		pListener.registerEvents(pm, this);
-		wListener.registerEvents(pm, this);
 		bListener.registerEvents(pm, this);
 		
 		loadPlayerWrappers();
@@ -69,6 +65,8 @@ public class IslandPlots extends JavaPlugin
 	@Override
 	public void onDisable()
 	{
+		saveConfig();
+		
 		savePlayerWrappers();
 		savePlotHandler();
 	}
@@ -86,6 +84,20 @@ public class IslandPlots extends JavaPlugin
 	public PlotHandler getPlotHandler()
 	{
 		return plotHandler;
+	}
+	
+	private void loadConfiguration()
+	{
+		getConfig().options().copyDefaults(true); 
+		saveConfig();
+	}
+	
+	private void loadDefaults()
+	{
+		FileConfiguration cfg = getConfig().options().configuration();
+		cfg.addDefault("spawn-world", "world");
+		
+		saveConfig();
 	}
 	
 	@SuppressWarnings("unchecked")
