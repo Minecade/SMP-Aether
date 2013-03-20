@@ -108,6 +108,11 @@ public class Plot implements Externalizable
 		this(world, owner, coord.x, coord.y);
 	}
 	
+	public void addMember(String name)
+	{
+		members.add(name);
+	}
+	
 	/**
 	 * Gets the plots coordinates on the plot grid
 	 * @return	coord
@@ -162,6 +167,26 @@ public class Plot implements Externalizable
 		return island;
 	}
 	
+	public int getLevel()
+	{
+		return level;
+	}
+	
+	public List<String> getMembers()
+	{
+		return new ArrayList<String>(members);
+	}
+	
+	public int getNextWealth()
+	{
+		return (int) (100*Math.pow(level, 2) + 50);
+	}
+	
+	public String getOwner()
+	{
+		return owner;
+	}
+	
 	/**
 	 * Get the region protecting the plot
 	 * @return	region
@@ -174,6 +199,19 @@ public class Plot implements Externalizable
 	public Location getSpawnPoint()
 	{
 		return island.getSpawnPoint();
+	}
+	
+	public int getWealth()
+	{
+		return wealth;
+	}
+	
+	private void levelUp()
+	{
+		level++;
+		Player player = Bukkit.getPlayer(owner);
+		if(player != null)
+			player.sendMessage(ChatColor.GOLD+"Your plot, "+this+", has leveled up. It is now level "+level+"!");
 	}
 	
 	public void registerBlockChange(Material type, boolean place)
@@ -192,38 +230,10 @@ public class Plot implements Externalizable
 		if(wealth >= getNextWealth())
 			levelUp();
 	}
-
-	private void levelUp()
-	{
-		level++;
-		Player player = Bukkit.getPlayer(owner);
-		if(player != null)
-			player.sendMessage(ChatColor.GOLD+"Your plot, "+this+", has leveled up. It is now level "+level+"!");
-	}
 	
-	public int getWealth()
+	public void removeMember(String name)
 	{
-		return wealth;
-	}
-	
-	public int getNextWealth()
-	{
-		return (int) (100*Math.pow(level, 2) + 50);
-	}
-	
-	public String getOwner()
-	{
-		return owner;
-	}
-	
-	public List<String> getMembers()
-	{
-		return members;
-	}
-	
-	public int getLevel()
-	{
-		return level;
+		members.remove(name);
 	}
 	
 	@Override

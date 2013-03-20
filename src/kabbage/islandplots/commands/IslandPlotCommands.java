@@ -32,30 +32,36 @@ public class IslandPlotCommands implements CommandExecutor
 				sender.sendMessage(ChatColor.RED+"Island world has not yet been created. Island related commands disabled.");
 				return true;
 			}
-			switch(command.get(1).toLowerCase())
+			String commandBase = command.get(1);
+			if(commandBase.equalsIgnoreCase("home"))
 			{
-			case "home":
 				handler.teleportHome();
-				break;
-			case "new": case "create":
+			} else if(commandBase.equalsIgnoreCase("new") || commandBase.equalsIgnoreCase("create"))
+			{
 				handler.createPlot();
-				break;
-			case "setworld":
+			} else if(commandBase.equalsIgnoreCase("setworld"))
+			{
 				handler.createIslandWorld(command.get(2));
-				break;
-			case "list":
+			} else if(commandBase.equalsIgnoreCase("list"))
+			{
 				handler.listHomes();
-				break;
-			case "info":
+			} else if(commandBase.equalsIgnoreCase("info"))
+			{
 				handler.sendInfo();
-				break;
-			case "makepermanent":
+			} else if(commandBase.equalsIgnoreCase("makepermanent"))
+			{
 				handler.makePermanent();
-				break;
-			case "abandon":
+			} else if(commandBase.equalsIgnoreCase("abandon"))
+			{
 				handler.abandonPlot();
-				break;
-			default:
+			} else if(commandBase.equalsIgnoreCase("addmember"))
+			{
+				handler.addPlayer(command.get(2));
+			} else if(commandBase.equalsIgnoreCase("removemember"))
+			{
+				handler.removePlayer(command.get(2));
+			} else
+			{
 				hardFailure = true;
 			}
 		} catch(IllegalArgumentException exx)

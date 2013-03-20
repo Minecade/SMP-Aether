@@ -158,7 +158,7 @@ public class PlotHandler implements Externalizable
 	 */
 	private List<Coordinate> getRingOfPlotPositions()
 	{
-		List<Coordinate> ring = new ArrayList<>();
+		List<Coordinate> ring = new ArrayList<Coordinate>();
 		for(int x = -currentRing; x <= currentRing; x++)
 		{
 			ring.add(new Coordinate(x, currentRing));

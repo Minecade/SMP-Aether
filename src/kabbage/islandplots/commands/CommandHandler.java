@@ -54,6 +54,18 @@ public class CommandHandler
 		}
 	}
 	
+	public void addPlayer(String playerName)
+	{
+		Player player = senderWrapper.getPlayer();
+		Plot plot = plugin.getPlotHandler().getPlot(player.getLocation());
+		if(plot == null)
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You are not currently in a plot to remove.");
+			return;
+		}
+		plot.addMember(playerName);
+	}
+	
 	public void createIslandWorld(String worldName)
 	{
 		if(!Permissions.isAdmin(senderWrapper.getSender()))
@@ -80,7 +92,7 @@ public class CommandHandler
 		int page = (command.hasArgAtIndex(2)) ? Utils.parseInt(command.getArgAtIndex(2), 0)-1 : 0;
 		PlayerWrapper playerW = PlayerWrapper.getWrapper(senderWrapper.getPlayer());
 		senderWrapper.sendMessage(ChatColor.GOLD+"Owned Island Plots:");
-		for(int i = page * 10; i < page * 10 + 10; i++)
+		for(int i = page * 5; i < page * 5 + 5; i++)
 		{
 			Plot p = playerW.getPlot(i);
 			if(p == null)
@@ -88,7 +100,7 @@ public class CommandHandler
 			//Args: Color, plot number, color, grid loc x, grid loc y
 			senderWrapper.sendMessage(String.format("%sPlot %d: %s[%d, %d]", ChatColor.DARK_AQUA, i+1, ChatColor.DARK_GRAY, p.getGridX(), p.getGridY()));
 		}
-		senderWrapper.sendMessage(String.format("Page %d/%d", page, playerW.getPlots() / 10));
+		senderWrapper.sendMessage(String.format("Page %d/%d", page, playerW.getPlots() / 5 + 1));
 	}
 	
 	public void makePermanent()
@@ -101,6 +113,18 @@ public class CommandHandler
 		}
 		plugin.getPlotHandler().makePermanent(plot);
 		senderWrapper.sendMessage(ChatColor.GREEN+"Plot successfully made permanent.");
+	}
+	
+	public void removePlayer(String playerName)
+	{
+		Player player = senderWrapper.getPlayer();
+		Plot plot = plugin.getPlotHandler().getPlot(player.getLocation());
+		if(plot == null)
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You are not currently in a plot to remove.");
+			return;
+		}
+		plot.removeMember(playerName);
 	}
 
 	public void sendInfo()
@@ -122,13 +146,19 @@ public class CommandHandler
 	
 	public void teleportHome()
 	{
-		int homeID = (command.hasArgAtIndex(2)) ? Utils.parseInt(command.getArgAtIndex(2), 1) : 1;
 		Player player = senderWrapper.getPlayer();
-		PlayerWrapper playerW = PlayerWrapper.getWrapper(senderWrapper.getPlayer());
-		Plot plot = playerW.getPlot(homeID - 1);
+		int homeID = (command.hasArgAtIndex(2)) ? Utils.parseInt(command.getArgAtIndex(2), 1) : 1;
+		String homeOwnerName = (command.hasArgAtIndex(3)) ? command.getArgAtIndex(3) : player.getName();
+		PlayerWrapper homeOwner = PlayerWrapper.getWrapper(homeOwnerName);
+		Plot plot = homeOwner.getPlot(homeID - 1);
 		if(plot == null)
 		{
 			senderWrapper.sendMessage(ChatColor.RED+"Specified plot could not be found.");
+			return;
+		}
+		if(!plot.getOwner().equalsIgnoreCase(player.getName()) && !plot.getMembers().contains(player.getName()) && !Permissions.isAdmin(senderWrapper.getSender()))
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You are not allowed to teleport to this plot.");
 			return;
 		}
 		player.teleport(plot.getIsland().getSpawnPoint());
