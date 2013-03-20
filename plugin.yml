@@ -8,5 +8,5 @@ commands:
     island:
         description: The plugins basic command.
         permissions:
-        usage: Nope
+        usage: /is new|home|addmember|removemember|list|info|abandon|setworld|makepermanent
         aliases: [is]

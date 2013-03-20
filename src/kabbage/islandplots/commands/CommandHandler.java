@@ -100,7 +100,7 @@ public class CommandHandler
 			//Args: Color, plot number, color, grid loc x, grid loc y
 			senderWrapper.sendMessage(String.format("%sPlot %d: %s[%d, %d]", ChatColor.DARK_AQUA, i+1, ChatColor.DARK_GRAY, p.getGridX(), p.getGridY()));
 		}
-		senderWrapper.sendMessage(String.format("Page %d/%d", page, playerW.getPlots() / 5 + 1));
+		senderWrapper.sendMessage(String.format("Page %d/%d", page + 1, playerW.getPlots() / 5 + 1));
 	}
 	
 	public void makePermanent()

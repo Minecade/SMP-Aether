@@ -54,7 +54,7 @@ public class PlayerWrapper implements Externalizable
 		int size = plotsOwned.size();
 		if(size == 0)
 			return true;
-		if(size > Permissions.maxPlots(getPlayer()))
+		if(size >= Permissions.maxPlots(getPlayer()))
 			return false;
 		if(!Utils.hasWebsiteAccount(playerName))
 			return false;
