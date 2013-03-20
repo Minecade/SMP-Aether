@@ -121,7 +121,8 @@ public class PlotHandler implements Externalizable
 	
 	public void removePlot(Plot plot)
 	{
-		IslandPlots.instance.getRedProtect().getGlobalRegionManager().remove(plot.getRegion());
+		if(plot.getRegion() != null)
+			IslandPlots.instance.getRedProtect().getGlobalRegionManager().remove(plot.getRegion());
 		openPlots.add(plot.getGridLocation());
 		plotGrid.remove(plot.getGridX(), plot.getGridX());
 		PlayerWrapper.getWrapper(plot.getOwner()).removePlot(plot);

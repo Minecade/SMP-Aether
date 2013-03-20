@@ -1,10 +1,13 @@
 package kabbage.islandplots.utils;
 
+import java.io.Serializable;
+
 /**
  * Very simple class for handling the coordinates of plots
  */
-public class Coordinate
+public class Coordinate implements Serializable
 {
+	private static final long serialVersionUID = "COORDINATE".hashCode();
 	public int x;
 	public int y;
 	
