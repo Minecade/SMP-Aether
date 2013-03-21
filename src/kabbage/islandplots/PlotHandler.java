@@ -150,7 +150,20 @@ public class PlotHandler implements Externalizable
 	 */
 	public Plot getPlot(int x, int z)
 	{
-		return plotGrid.get(x, z);
+		Plot plot = plotGrid.get(x, z);
+		if(plot == null)
+		{
+			for(PlayerWrapper pw : PlayerWrapper.players.values())
+			{
+				Plot p = pw.getPlot(0);
+				if(p != null && p.getGridLocation().equals(new Coordinate(x, z)))
+				{
+					plotGrid.put(x, z, p);
+					return p;
+				}
+			}
+		}
+		return plot;
 	}
 	
 	/**

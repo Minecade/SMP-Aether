@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import com.OverCaste.plugin.RedProtect.DefineRegionBuilder;
 import com.OverCaste.plugin.RedProtect.Region;
 import com.OverCaste.plugin.RedProtect.RegionBuilder;
+import com.OverCaste.plugin.RedProtect.RegionManager;
 
 import kabbage.islandplots.utils.Coordinate;
 
@@ -93,19 +94,19 @@ public class Plot implements Externalizable
 		level = 0;
 		wealth = 0;
 		
+		RegionManager manager = IslandPlots.instance.getRedProtect().getGlobalRegionManager();
 		Location topCorner = new Location(Bukkit.getWorld(world), getX() + PlotHandler.PLOT_SIZE / 2 - 1, 256, getZ() + PlotHandler.PLOT_SIZE / 2 - 1);
 		Location bottomCorner = new Location(Bukkit.getWorld(world), getX() - PlotHandler.PLOT_SIZE / 2, 0, getZ() - PlotHandler.PLOT_SIZE / 2);
 		RegionBuilder builder = new DefineRegionBuilder(Bukkit.getPlayer(owner), topCorner, bottomCorner, "Plot "+gridX+":"+gridY, owner);
 		region = builder.build();
+		Region current = manager.getRegion(new Location(Bukkit.getWorld(world), getX(), 64, getZ()));
+		if(current != null)
+			manager.remove(current);
 		try
 		{
-			IslandPlots.instance.getRedProtect().getGlobalRegionManager().add(region, Bukkit.getWorld(world));
+			manager.add(region, Bukkit.getWorld(world));
 		} catch(NullPointerException e)
-		{
-			IslandPlots.instance.getRedProtect().getGlobalRegionManager().remove(
-					IslandPlots.instance.getRedProtect().getGlobalRegionManager().getRegion(region.getName(), Bukkit.getWorld(world)));
-			IslandPlots.instance.getRedProtect().getGlobalRegionManager().add(region, Bukkit.getWorld(world));
-		}
+		{}
 		
 		island = new Island(world, getX(), 80, getZ());
 		island.generate(owner);

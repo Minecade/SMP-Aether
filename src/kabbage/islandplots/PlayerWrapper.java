@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import kabbage.islandplots.utils.Permissions;
-import kabbage.islandplots.utils.Utils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -53,13 +50,6 @@ public class PlayerWrapper implements Externalizable
 	{
 		int size = plotsOwned.size();
 		if(size == 0)
-			return true;
-		if(size >= Permissions.maxPlots(getPlayer()))
-			return false;
-		if(!Utils.hasWebsiteAccount(playerName))
-			return false;
-		Plot lastPlot = plotsOwned.get(size - 1);
-		if(lastPlot.getLevel() >= 3)
 			return true;
 		return false;
 	}
@@ -120,5 +110,17 @@ public class PlayerWrapper implements Externalizable
 		
 		out.writeUTF(playerName);
 		out.writeObject(plotsOwned);
+	}
+
+	public void reset()
+	{
+		for(int i = 0; i < plotsOwned.size(); i++)
+		{
+			Plot p = plotsOwned.get(i);
+			if(!p.getOwner().equals(playerName))
+				continue;
+			IslandPlots.instance.getPlotHandler().removePlot(p);
+		}
+		plotsOwned.clear();
 	}
 }

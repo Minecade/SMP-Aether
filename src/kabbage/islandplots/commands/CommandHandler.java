@@ -44,12 +44,8 @@ public class CommandHandler
 		}
 		if(plugin.getPlotHandler().needConfirmationUntiDeletion.contains(plot))
 		{
-			plugin.getPlotHandler().removePlot(plot);
-			Plot defaultP = PlayerWrapper.getWrapper(player).getPlot(0);
-			if(defaultP != null)
-				player.teleport(defaultP.getSpawnPoint());
-			else
-				player.teleport(player.getWorld().getSpawnLocation());
+			player.teleport(Bukkit.getWorld(plugin.getConfig().getString("spawn-world")).getSpawnLocation());
+			PlayerWrapper.getWrapper(player).reset();
 			senderWrapper.sendMessage(ChatColor.RED+"Plot abandoned.");
 		} else
 		{
@@ -79,7 +75,10 @@ public class CommandHandler
 	public void createIslandWorld(String worldName)
 	{
 		if(!Permissions.isAdmin(senderWrapper.getSender()))
+		{
 			senderWrapper.sendMessage(ChatColor.RED+"You do not have permission to do this.");
+			return;
+		}
 		Bukkit.dispatchCommand(senderWrapper.getSender(), "mv create "+worldName+" normal -g IslandPlots");
 		plugin.setPlotHandler(new PlotHandler(worldName));
 	}
@@ -89,12 +88,27 @@ public class CommandHandler
 		String playerName = senderWrapper.getPlayer().getName();
 		if(!PlayerWrapper.getWrapper(playerName).canHavePlot())
 		{
-			int maxPlots = Permissions.maxPlots(senderWrapper.getPlayer());
-			senderWrapper.sendMessage(ChatColor.RED+"You are not allowed to have another plot. You must have a website account, your last created plot must" +
-					"be level 3 or higher, and you may not have more than "+maxPlots+" plot(s).");
+			senderWrapper.sendMessage(ChatColor.RED+"You may only have one plot.");
 			return;
 		}
 		plugin.getPlotHandler().appendPlot(playerName);
+	}
+	
+	public void fixPlayer(String player)
+	{
+		if(!Permissions.isAdmin(senderWrapper.getSender()))
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You do not have permission to do this.");
+			return;
+		}
+		PlayerWrapper pw = PlayerWrapper.getWrapper(player);
+		if(pw == null)
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"Player not found.");
+			return;
+		}
+		pw.reset();
+		senderWrapper.sendMessage(ChatColor.GOLD+"Player 'fixed'. Probably...");
 	}
 	
 	public void listHomes()
@@ -163,17 +177,17 @@ public class CommandHandler
 	{
 		Player player = senderWrapper.getPlayer();
 		int homeID = (command.hasArgAtIndex(2)) ? Utils.parseInt(command.getArgAtIndex(2), 1) : 1;
-		String homeOwnerName = (command.hasArgAtIndex(3)) ? command.getArgAtIndex(3) : player.getName();
-		PlayerWrapper homeOwner = PlayerWrapper.getWrapper(homeOwnerName);
+		PlayerWrapper homeOwner = PlayerWrapper.getWrapper(player.getName());
 		Plot plot = homeOwner.getPlot(homeID - 1);
 		if(plot == null)
 		{
 			senderWrapper.sendMessage(ChatColor.RED+"Specified plot could not be found.");
 			return;
 		}
-		if(!plot.getOwner().equalsIgnoreCase(player.getName()) && !plot.getMembers().contains(player.getName()) && !Permissions.isAdmin(senderWrapper.getSender()))
+		if(!plot.getOwner().equals(player.getName()))
 		{
-			senderWrapper.sendMessage(ChatColor.RED+"You are not allowed to teleport to this plot.");
+			homeOwner.removePlot(plot);
+			senderWrapper.sendMessage(ChatColor.RED+"Error. Try again later.");
 			return;
 		}
 		player.teleport(plot.getIsland().getSpawnPoint());

@@ -151,7 +151,7 @@ public class IslandGenerator extends BukkitRunnable
 		
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Finding safe spawn point..."));
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncTeleport());
-		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Welcome to your island! The entire island is yours, do " +
+		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.RED+"Welcome to your island! The entire island is yours, do " +
 				"with it what you will. You can have your friends help you by typing - /is addmember <name>"));
 	}
 

@@ -139,6 +139,7 @@ public class IslandPlots extends JavaPlugin
         } catch (Exception e)
         {
         	log(Level.WARNING, "Couldn't load the PlotHandler database. Ignore if the island world has not yet been created.");
+        	e.printStackTrace();
         }
 	}
 	
