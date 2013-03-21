@@ -37,6 +37,11 @@ public class CommandHandler
 			senderWrapper.sendMessage(ChatColor.RED+"You are not currently in a plot to remove.");
 			return;
 		}
+		if(!plot.getOwner().equals(player.getName()))
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You don't own this plot.");
+			return;
+		}
 		if(plugin.getPlotHandler().needConfirmationUntiDeletion.contains(plot))
 		{
 			plugin.getPlotHandler().removePlot(plot);
@@ -61,6 +66,11 @@ public class CommandHandler
 		if(plot == null)
 		{
 			senderWrapper.sendMessage(ChatColor.RED+"You are not currently in a plot to remove.");
+			return;
+		}
+		if(!plot.getOwner().equals(player.getName()))
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You don't own this plot.");
 			return;
 		}
 		plot.addMember(playerName);
@@ -122,6 +132,11 @@ public class CommandHandler
 		if(plot == null)
 		{
 			senderWrapper.sendMessage(ChatColor.RED+"You are not currently in a plot to remove.");
+			return;
+		}
+		if(!plot.getOwner().equals(player.getName()))
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You don't own this plot.");
 			return;
 		}
 		plot.removeMember(playerName);

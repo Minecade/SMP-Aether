@@ -97,7 +97,15 @@ public class Plot implements Externalizable
 		Location bottomCorner = new Location(Bukkit.getWorld(world), getX() - PlotHandler.PLOT_SIZE / 2, 0, getZ() - PlotHandler.PLOT_SIZE / 2);
 		RegionBuilder builder = new DefineRegionBuilder(Bukkit.getPlayer(owner), topCorner, bottomCorner, "Plot "+gridX+":"+gridY, owner);
 		region = builder.build();
-		IslandPlots.instance.getRedProtect().getGlobalRegionManager().add(region, Bukkit.getWorld(world));
+		try
+		{
+			IslandPlots.instance.getRedProtect().getGlobalRegionManager().add(region, Bukkit.getWorld(world));
+		} catch(NullPointerException e)
+		{
+			IslandPlots.instance.getRedProtect().getGlobalRegionManager().remove(
+					IslandPlots.instance.getRedProtect().getGlobalRegionManager().getRegion(region.getName(), Bukkit.getWorld(world)));
+			IslandPlots.instance.getRedProtect().getGlobalRegionManager().add(region, Bukkit.getWorld(world));
+		}
 		
 		island = new Island(world, getX(), 80, getZ());
 		island.generate(owner);
@@ -111,6 +119,7 @@ public class Plot implements Externalizable
 	public void addMember(String name)
 	{
 		members.add(name);
+		region.addMember(name);
 	}
 	
 	/**
@@ -234,6 +243,7 @@ public class Plot implements Externalizable
 	public void removeMember(String name)
 	{
 		members.remove(name);
+		region.removeMember(name);
 	}
 	
 	@Override

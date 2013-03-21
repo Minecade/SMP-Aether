@@ -29,15 +29,15 @@ public class PlotHandler implements Externalizable
 	static final int PLOT_PADDING = 100;
 	
 	private String world;
-	private Table<Integer, Integer, Plot> plotGrid;
-	private int currentRing;
-	private List<Coordinate> openPlots;	//List of plots opened up after having been removed
+	private volatile Table<Integer, Integer, Plot> plotGrid;
+	private volatile int currentRing;
+	private volatile List<Coordinate> openPlots;	//List of plots opened up after having been removed
 	
-	private Map<Plot, Integer> toDeletion;	//Map of level 0 plots to their time until deleting (in minutes)
+	private volatile Map<Plot, Integer> toDeletion;	//Map of level 0 plots to their time until deleting (in minutes)
 	
 	//List of plots people have tried to delete, but they still need to type the command a second time to confirm the deletion.
 	//Periodically cleared
-	public transient List<Plot> needConfirmationUntiDeletion = new ArrayList<Plot>();
+	public volatile List<Plot> needConfirmationUntiDeletion = new ArrayList<Plot>();
 	
 	/**
 	 * Empty constructor for externalization
@@ -55,7 +55,7 @@ public class PlotHandler implements Externalizable
 				Stack<Plot> toRemove = new Stack<Plot>();
 				for(Entry<Plot, Integer> e : toDeletion.entrySet())
 				{
-					if(e.getKey().getLevel() >= 2)
+					if(e.getKey().getLevel() >= 5)
 						toRemoveFromDelete.add(e.getKey());
 					else
 					{
@@ -66,7 +66,7 @@ public class PlotHandler implements Externalizable
 					
 				}
 				for(Plot p : toRemoveFromDelete) toDeletion.remove(p);
-				for(Plot p : toRemove) removePlot(p);
+				for(Plot p : toRemove) {removePlot(p);toDeletion.remove(p);}
 				needConfirmationUntiDeletion.clear();
 			}
 		},1200L, 1200L);
@@ -111,7 +111,7 @@ public class PlotHandler implements Externalizable
 		if(plot != null)
 		{
 			PlayerWrapper.getWrapper(owner).addPlot(plot);
-			toDeletion.put(plot, 1440 * 3);	//The plot has 3 days to reach level 2 before being deleted
+			toDeletion.put(plot, 1440 * 7);	//The plot has 7 days to reach level 5 before being deleted
 			return plot;
 		}
 		// All of the plots in the current ring must be filled. Go to the next ring and try again
