@@ -51,7 +51,7 @@ public class PlayerWrapper implements Externalizable
 		int size = plotsOwned.size();
 		if(size == 0)
 			return true;
-		return false;
+		return true;//TODO set false
 	}
 	
 	public Player getPlayer()

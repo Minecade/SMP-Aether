@@ -48,9 +48,6 @@ public class IslandPlotCommands implements CommandExecutor
 			} else if(commandBase.equalsIgnoreCase("info"))
 			{
 				handler.sendInfo();
-			} else if(commandBase.equalsIgnoreCase("makepermanent"))
-			{
-				handler.makePermanent();
 			} else if(commandBase.equalsIgnoreCase("abandon"))
 			{
 				handler.abandonPlot();

@@ -127,18 +127,6 @@ public class CommandHandler
 		senderWrapper.sendMessage(String.format("Page %d/%d", page + 1, playerW.getPlots() / 5 + 1));
 	}
 	
-	public void makePermanent()
-	{
-		Plot plot = plugin.getPlotHandler().getPlot(senderWrapper.getPlayer().getLocation());
-		if(plot == null)
-		{
-			senderWrapper.sendMessage(ChatColor.RED+"You are not currently in a plot to make permanent.");
-			return;
-		}
-		plugin.getPlotHandler().makePermanent(plot);
-		senderWrapper.sendMessage(ChatColor.GREEN+"Plot successfully made permanent.");
-	}
-	
 	public void removePlayer(String playerName)
 	{
 		Player player = senderWrapper.getPlayer();
@@ -182,12 +170,6 @@ public class CommandHandler
 		if(plot == null)
 		{
 			senderWrapper.sendMessage(ChatColor.RED+"Specified plot could not be found.");
-			return;
-		}
-		if(!plot.getOwner().equals(player.getName()))
-		{
-			homeOwner.removePlot(plot);
-			senderWrapper.sendMessage(ChatColor.RED+"Error. Try again later.");
 			return;
 		}
 		player.teleport(plot.getIsland().getSpawnPoint());

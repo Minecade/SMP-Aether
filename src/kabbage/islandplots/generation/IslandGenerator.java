@@ -13,7 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_5_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_5_R2.CraftChunk;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -32,6 +32,8 @@ public class IslandGenerator extends BukkitRunnable
 	long seed;
 	
 	String player;
+	
+	volatile Stack<Chunk> toPopulate = new Stack<Chunk>();
 	
 	public IslandGenerator(Island island, org.bukkit.World world, int x, int y, int z, int width, int length, int height, String player)
 	{
@@ -64,86 +66,25 @@ public class IslandGenerator extends BukkitRunnable
 	public void runWithThrows() throws InterruptedException
 	{
 		PerlinNoise noise = new PerlinNoise(seed, width << 4, length << 4);
-		Stack<Chunk> toPopulate = new Stack<Chunk>();
 		int aFrom = (x >> 4) - (width >> 1);
 		int aTo = (x >> 4) + (width >> 1);
 		int bFrom = (z >> 4) - (length >> 1);
 		int bTo = (z >> 4) + (length >> 1);
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Generating chunks..."));
+		int chunksDone = 0;
 		for(int a = aFrom; a < aTo; a++)
 		{
 			for(int b = bFrom; b < bTo; b++)
 			{
-				Future<Chunk> fChunk = Bukkit.getScheduler().callSyncMethod(IslandPlots.instance, new GetSyncChunk(a, b));
-				Chunk chunk;
-				try
-				{
-					chunk = fChunk.get();
-				} catch (Exception e)
-				{
-					e.printStackTrace();
-					//Retry
-					b--;
-					continue;
-				}
-				toPopulate.add(chunk);
-				
-				Biome[][] biomes;
-				Future<Biome[][]> fBiomes = Bukkit.getScheduler().callSyncMethod(IslandPlots.instance, new GetSyncBiomes(chunk));
-				try
-				{
-					biomes = fBiomes.get();
-				} catch (Exception e)
-				{
-					e.printStackTrace();
-					//Retry
-					toPopulate.remove(chunk);
-					b--;
-					continue;
-				}
-				byte[][][] blocks = new byte[16][128][16];
-				for(int i = 0; i < 16; i++)
-				{
-					for(int k = 0; k < 16; k++)
-					{
-						int worldX = i + a * 16;
-						int worldZ = k + b * 16;
-						float noiseVal = (float) (noise.islandNoise(worldX - x, worldZ - z, 5, 0.35f) + .5);	//Add .5 to initial noise to increase volume
-						Biome biome = biomes[i][k];
-						boolean doBottom = false;
-						int sectionHeight = (int) (noiseVal * height);
-						for(int y = 0; y <= sectionHeight; y++)
-						{
-							//Only do the bottom if there's a top. Otherwise it looks silly
-							doBottom = true;
-							byte type = 1;
-							//Decorate top of land mass
-							if(sectionHeight - y <= 3)
-							{
-								if (biome == Biome.DESERT)
-									type = sectionHeight - y == 3 ? (byte) 24 : (byte) 12;
-								else
-									type = sectionHeight - y == 0 ? (byte) 2 : (byte) 3;
-							}
-							blocks[i][this.y + y][k] = type;
-						}
-						if(doBottom)
-						{
-							int oppY = 0;
-							//When making the bottom half of the island, scew it so it doesn't look exactly like the top
-							noiseVal = noise.addOctave(worldX - x, worldZ - z, noiseVal, 0.45f, 3);
-							sectionHeight = (int) (noiseVal * height * 2.25);	//Make the bottom deeper than the top is high to make room for ores/caves
-							sectionHeight += rnd.nextInt(2);
-							for(int y = 0; y <= sectionHeight; y++)
-								blocks[i][this.y + --oppY][k] = 1;
-						}
-					}
-				}
-				SetSyncBlocks setBlocks = new SetSyncBlocks(chunk, blocks);
-				Bukkit.getScheduler().runTask(IslandPlots.instance, setBlocks);
-				while(!setBlocks.isDone) Thread.sleep(50l);
+				chunksDone++;
+				Bukkit.getScheduler().runTaskAsynchronously(IslandPlots.instance, new GenerateChunk(noise, a, b));
+				Thread.sleep(50L);
 			}
 		}
+		int checks = 0;
+		while(toPopulate.size() < chunksDone && ++checks < 100)
+			Thread.sleep(50L);
+		
 		
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Populating chunks..."));
 		for(Chunk chunk : toPopulate) 
@@ -153,6 +94,106 @@ public class IslandGenerator extends BukkitRunnable
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncTeleport());
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.RED+"Welcome to your island! The entire island is yours, do " +
 				"with it what you will. You can have your friends help you by typing - /is addmember <name>"));
+	}
+	
+	class GenerateChunk extends BukkitRunnable
+	{
+		PerlinNoise noise;
+		int a;
+		int b;
+		public GenerateChunk(PerlinNoise noise, int a, int b)
+		{
+			this.noise = noise;
+			this.a = a;
+			this.b = b;
+		}
+		
+		@Override
+		public void run()
+		{
+			try
+			{
+				runWithThrows();
+			} catch (InterruptedException e)
+			{
+				e.printStackTrace();
+				run();
+			}
+		}
+		
+		public void runWithThrows() throws InterruptedException
+		{
+			Future<Chunk> fChunk = Bukkit.getScheduler().callSyncMethod(IslandPlots.instance, new GetSyncChunk(a, b));
+			Chunk chunk;
+			try
+			{
+				chunk = fChunk.get();
+			} catch (Exception e)
+			{
+				e.printStackTrace();
+				//Retry
+				runWithThrows();
+				return;
+			}
+			toPopulate.push(chunk);
+			
+			Biome[][] biomes;
+			Future<Biome[][]> fBiomes = Bukkit.getScheduler().callSyncMethod(IslandPlots.instance, new GetSyncBiomes(chunk));
+			try
+			{
+				biomes = fBiomes.get();
+			} catch (Exception e)
+			{
+				e.printStackTrace();
+				//Retry
+				toPopulate.pop();
+				runWithThrows();
+				return;
+			}
+			byte[][][] blocks = new byte[16][128][16];
+			for(int i = 0; i < 16; i++)
+			{
+				for(int k = 0; k < 16; k++)
+				{
+					int worldX = i + a * 16;
+					int worldZ = k + b * 16;
+					float noiseVal = (float) (noise.islandNoise(worldX - x, worldZ - z, 5, 0.35f) + .5);	//Add .5 to initial noise to increase volume
+					Biome biome = biomes[i][k];
+					boolean doBottom = false;
+					int sectionHeight = (int) (noiseVal * height);
+					for(int deltaY = 0; deltaY <= sectionHeight; deltaY++)
+					{
+						//Only do the bottom if there's a top. Otherwise it looks silly
+						doBottom = true;
+						byte type = 1;
+						//Decorate top of land mass
+						if(sectionHeight - deltaY <= 3)
+						{
+							if (biome == Biome.DESERT)
+								type = sectionHeight - deltaY == 3 ? (byte) 24 : (byte) 12;
+							else
+								type = sectionHeight - deltaY == 0 ? (byte) 2 : (byte) 3;
+						}
+						blocks[i][y + deltaY][k] = type;
+					}
+					if(doBottom)
+					{
+						int oppY = 0;
+						//When making the bottom half of the island, scew it so it doesn't look exactly like the top
+						noiseVal = noise.addOctave(worldX - x, worldZ - z, noiseVal, 0.45f, 3);
+						sectionHeight = (int) (noiseVal * height * 2.25);	//Make the bottom deeper than the top is high to make room for ores/caves
+						sectionHeight += rnd.nextInt(2);
+						if(y - sectionHeight < 0)
+							sectionHeight -= y - sectionHeight;
+						for(int deltaY = 0; deltaY <= sectionHeight; deltaY++)
+							blocks[i][y + --oppY][k] = 1;
+					}
+				}
+			}
+			SetSyncBlocks setBlocks = new SetSyncBlocks(chunk, blocks);
+			Bukkit.getScheduler().runTask(IslandPlots.instance, setBlocks);
+			while(!setBlocks.isDone) Thread.sleep(50l);
+		}
 	}
 
 	class GetSyncChunk implements Callable<Chunk>
@@ -229,7 +270,7 @@ public class IslandGenerator extends BukkitRunnable
 	{
 		public volatile boolean isDone = false;
 		
-		net.minecraft.server.v1_5_R1.Chunk chunk;
+		net.minecraft.server.v1_5_R2.Chunk chunk;
 		byte[][][] blocks;
 		public SetSyncBlocks(Chunk chunk, byte[][][] blocks)
 		{

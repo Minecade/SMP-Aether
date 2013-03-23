@@ -5,11 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Stack;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -23,17 +19,13 @@ import com.google.common.collect.TreeBasedTable;
 public class PlotHandler implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
-	private static final int VERSION = 2;
+	private static final int VERSION = 3;
 	
 	static final int PLOT_SIZE = 300;
 	static final int PLOT_PADDING = 100;
 	
 	private String world;
 	private volatile Table<Integer, Integer, Plot> plotGrid;
-	private volatile int currentRing;
-	private volatile List<Coordinate> openPlots;	//List of plots opened up after having been removed
-	
-	private volatile Map<Plot, Integer> toDeletion;	//Map of level 0 plots to their time until deleting (in minutes)
 	
 	//List of plots people have tried to delete, but they still need to type the command a second time to confirm the deletion.
 	//Periodically cleared
@@ -44,29 +36,11 @@ public class PlotHandler implements Externalizable
 	 */
 	public PlotHandler()
 	{
-		//Every minute, plots scheduled to be deleted are set one minute closer to being deleted. If they leveled up, proving they aren't
-		//inactive, they get removed from the map of plots to be deleted. If they are 0 minutes away from deletion, delete them.
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(IslandPlots.instance, new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				Stack<Plot> toRemoveFromDelete = new Stack<Plot>();
-				Stack<Plot> toRemove = new Stack<Plot>();
-				for(Entry<Plot, Integer> e : toDeletion.entrySet())
-				{
-					if(e.getKey().getLevel() >= 5)
-						toRemoveFromDelete.add(e.getKey());
-					else
-					{
-						e.setValue(e.getValue() - 1);
-						if(e.getValue() <= 0)
-							toRemove.add(e.getKey());
-					}
-					
-				}
-				for(Plot p : toRemoveFromDelete) toDeletion.remove(p);
-				for(Plot p : toRemove) {removePlot(p);toDeletion.remove(p);}
 				needConfirmationUntiDeletion.clear();
 			}
 		},1200L, 1200L);
@@ -77,9 +51,6 @@ public class PlotHandler implements Externalizable
 		this();
 		this.world = world;
 		plotGrid = TreeBasedTable.create();
-		currentRing = 0;
-		openPlots = new ArrayList<Coordinate>();
-		toDeletion = new HashMap<Plot, Integer>();
 	}
 	
 	/**
@@ -91,14 +62,10 @@ public class PlotHandler implements Externalizable
 	public Plot appendPlot(String owner)
 	{
 		Plot plot = null;
-		if(!openPlots.isEmpty())
+		int ring = 0;
+		while(plot == null)
 		{
-			Coordinate coord = openPlots.remove(0);
-			plot = new Plot(world, owner, coord);
-			plotGrid.put(coord.x, coord.y, plot);
-		} else
-		{
-			for(Coordinate coord : getRingOfPlotPositions())
+			for(Coordinate coord : getRingOfPlotPositions(ring++))
 			{
 				if(!plotGrid.contains(coord.x, coord.y))
 				{
@@ -108,22 +75,14 @@ public class PlotHandler implements Externalizable
 				}
 			}
 		}
-		if(plot != null)
-		{
-			PlayerWrapper.getWrapper(owner).addPlot(plot);
-			toDeletion.put(plot, 1440 * 7);	//The plot has 7 days to reach level 5 before being deleted
-			return plot;
-		}
-		// All of the plots in the current ring must be filled. Go to the next ring and try again
-		currentRing++;
-		return appendPlot(owner);
+		PlayerWrapper.getWrapper(owner).addPlot(plot);
+		return plot;
 	}
 	
 	public void removePlot(Plot plot)
 	{
 		if(plot.getRegion() != null)
 			IslandPlots.instance.getRedProtect().getGlobalRegionManager().remove(plot.getRegion());
-		openPlots.add(plot.getGridLocation());
 		plotGrid.remove(plot.getGridX(), plot.getGridX());
 		PlayerWrapper.getWrapper(plot.getOwner()).removePlot(plot);
 	}
@@ -150,27 +109,10 @@ public class PlotHandler implements Externalizable
 	 */
 	public Plot getPlot(int x, int z)
 	{
-		Plot plot = plotGrid.get(x, z);
-		if(plot == null)
-		{
-			for(PlayerWrapper pw : PlayerWrapper.players.values())
-			{
-				Plot p = pw.getPlot(0);
-				if(p != null && p.getGridLocation().equals(new Coordinate(x, z)))
-				{
-					plotGrid.put(x, z, p);
-					return p;
-				}
-			}
-		}
-		return plot;
+		return plotGrid.get(x, z);
 	}
 	
-	/**
-	 * Gets the coordinates of the plots that occupy the outermost unfilled ring of the grid
-	 * @return	map of coordinates
-	 */
-	private List<Coordinate> getRingOfPlotPositions()
+	private List<Coordinate> getRingOfPlotPositions(int currentRing)
 	{
 		List<Coordinate> ring = new ArrayList<Coordinate>();
 		for(int x = -currentRing; x <= currentRing; x++)
@@ -186,11 +128,6 @@ public class PlotHandler implements Externalizable
 		return ring;
 	}
 	
-	public void makePermanent(Plot p)
-	{
-		toDeletion.remove(p);
-	}
-	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
@@ -199,17 +136,20 @@ public class PlotHandler implements Externalizable
 		if(ver == 1)
 		{
 			world = in.readUTF();
-			currentRing = in.readInt();
+			in.readInt();
 			plotGrid = (Table<Integer, Integer, Plot>) in.readObject();
-			openPlots = (List<Coordinate>) in.readObject();
-			toDeletion = new HashMap<Plot, Integer>();
+			in.readObject();
 		} else if(ver == 2)
 		{
 			world = in.readUTF();
-			currentRing = in.readInt();
+			in.readInt();
 			plotGrid = (Table<Integer, Integer, Plot>) in.readObject();
-			openPlots = (List<Coordinate>) in.readObject();
-			toDeletion = (Map<Plot, Integer>) in.readObject();
+			in.readObject();
+			in.readObject();
+		} else if(ver == 3)
+		{
+			world = in.readUTF();
+			plotGrid = (Table<Integer, Integer, Plot>) in.readObject();
 		} else
 		{
 			IslandPlots.log(Level.WARNING, "Unsupported version of the PlotHandler failed to load.");
@@ -222,9 +162,6 @@ public class PlotHandler implements Externalizable
 		out.writeInt(VERSION);
 		
 		out.writeUTF(world);
-		out.writeInt(currentRing);
 		out.writeObject(plotGrid);
-		out.writeObject(openPlots);
-		out.writeObject(toDeletion);
 	}
 }
