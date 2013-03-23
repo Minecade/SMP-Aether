@@ -14,6 +14,7 @@ import kabbage.islandplots.listeners.BlockListener;
 import kabbage.islandplots.listeners.PlayerListener;
 import kabbage.islandplots.utils.Constants;
 
+import kabbage.islandplots.generation.GenerationQueue;
 import kabbage.islandplots.generation.NullChunkGenerator;
 
 import org.bukkit.Bukkit;
@@ -32,6 +33,7 @@ public class IslandPlots extends JavaPlugin
 	private RedProtect redProtect;
 	
 	private PlotHandler plotHandler;
+	private GenerationQueue generationQueue;
 	
 	private IslandPlotCommands ipCommands;
 	//Listeners
@@ -60,6 +62,8 @@ public class IslandPlots extends JavaPlugin
 		
 		loadPlayerWrappers();
 		loadPlotHandler();
+		
+		generationQueue = new GenerationQueue();
 	}
 
 	@Override
@@ -84,6 +88,11 @@ public class IslandPlots extends JavaPlugin
 	public PlotHandler getPlotHandler()
 	{
 		return plotHandler;
+	}
+	
+	public GenerationQueue getGenerationQueue()
+	{
+		return generationQueue;
 	}
 	
 	private void loadConfiguration()

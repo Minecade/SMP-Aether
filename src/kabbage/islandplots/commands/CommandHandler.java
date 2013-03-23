@@ -91,6 +91,13 @@ public class CommandHandler
 			senderWrapper.sendMessage(ChatColor.RED+"You may only have one plot.");
 			return;
 		}
+		if(plugin.getGenerationQueue().isFull())
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"Too many plots are already queued to be generated. Please try again later.");
+			return;
+		}
+		if(!plugin.getGenerationQueue().isEmpty())
+			senderWrapper.sendMessage(ChatColor.GOLD+"Your plot is now queued for creation. You will be informed when your plot is next in queue.");
 		plugin.getPlotHandler().appendPlot(playerName);
 	}
 	

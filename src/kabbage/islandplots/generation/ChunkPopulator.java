@@ -15,7 +15,7 @@ import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class ChunkPopulator extends BukkitRunnable
+public class ChunkPopulator
 {
 	World world;
 	Chunk chunk;
@@ -36,19 +36,7 @@ public class ChunkPopulator extends BukkitRunnable
 		islandHeight = y;
 	}
 	
-	@Override
-	public void run()
-	{
-		try
-		{
-			runWithThrows();
-		} catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	public void runWithThrows() throws InterruptedException
+	public void populate() throws InterruptedException
 	{
 		net.minecraft.server.v1_5_R2.World nmsWorld = ((CraftWorld) world).getHandle();
 		

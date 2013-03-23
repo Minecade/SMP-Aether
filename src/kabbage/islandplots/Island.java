@@ -40,7 +40,7 @@ public class Island implements Externalizable
 	public void generate(String player)
 	{
 		IslandGenerator generator = new IslandGenerator(this, Bukkit.getWorld(world), x, y, z, CHUNK_WIDTH, CHUNK_LENGTH, HEIGHT, player);
-		Bukkit.getScheduler().runTaskAsynchronously(IslandPlots.instance, generator);
+		IslandPlots.instance.getGenerationQueue().add(generator);
 	}
 	
 	public Location getSpawnPoint()

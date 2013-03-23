@@ -35,6 +35,8 @@ public class IslandGenerator extends BukkitRunnable
 	
 	volatile Stack<Chunk> toPopulate = new Stack<Chunk>();
 	
+	volatile boolean running;
+	
 	public IslandGenerator(Island island, org.bukkit.World world, int x, int y, int z, int width, int length, int height, String player)
 	{
 		this.island = island;
@@ -49,6 +51,8 @@ public class IslandGenerator extends BukkitRunnable
 		seed = new Random().nextLong();
 		rnd = new Random(seed);
 		this.player = player;
+		
+		running = true;
 	}
 	
 	@Override
@@ -61,6 +65,7 @@ public class IslandGenerator extends BukkitRunnable
 		{
 			e.printStackTrace();
 		}
+		running = false;
 	}
 	
 	public void runWithThrows() throws InterruptedException
@@ -78,7 +83,7 @@ public class IslandGenerator extends BukkitRunnable
 			{
 				chunksDone++;
 				Bukkit.getScheduler().runTaskAsynchronously(IslandPlots.instance, new GenerateChunk(noise, a, b));
-				Thread.sleep(100L);
+				Thread.sleep(50L);
 			}
 		}
 		while(toPopulate.size() < chunksDone)
@@ -87,10 +92,7 @@ public class IslandGenerator extends BukkitRunnable
 		
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Populating chunks..."));
 		for(Chunk chunk : toPopulate)
-		{
-			Bukkit.getScheduler().runTaskAsynchronously(IslandPlots.instance, new ChunkPopulator(world, chunk, rnd, y));
-			Thread.sleep(100L);
-		}
+			new ChunkPopulator(world, chunk, rnd, y).populate();
 		
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Finding safe spawn point..."));
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncTeleport());
@@ -185,8 +187,8 @@ public class IslandGenerator extends BukkitRunnable
 						noiseVal = noise.addOctave(worldX - x, worldZ - z, noiseVal, 0.45f, 3);
 						sectionHeight = (int) (noiseVal * height * 2.25);	//Make the bottom deeper than the top is high to make room for ores/caves
 						sectionHeight += rnd.nextInt(2);
-						if(y - sectionHeight < 0)
-							sectionHeight -= y - sectionHeight;
+						if(sectionHeight > y - 1)
+							sectionHeight = y - 1;
 						for(int deltaY = 0; deltaY <= sectionHeight; deltaY++)
 							blocks[i][y + --oppY][k] = 1;
 					}
