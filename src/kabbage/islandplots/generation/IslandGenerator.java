@@ -78,17 +78,19 @@ public class IslandGenerator extends BukkitRunnable
 			{
 				chunksDone++;
 				Bukkit.getScheduler().runTaskAsynchronously(IslandPlots.instance, new GenerateChunk(noise, a, b));
-				Thread.sleep(50L);
+				Thread.sleep(100L);
 			}
 		}
-		int checks = 0;
-		while(toPopulate.size() < chunksDone && ++checks < 100)
+		while(toPopulate.size() < chunksDone)
 			Thread.sleep(50L);
 		
 		
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Populating chunks..."));
-		for(Chunk chunk : toPopulate) 
-			new ChunkPopulator(world, chunk, rnd, y).populate();
+		for(Chunk chunk : toPopulate)
+		{
+			Bukkit.getScheduler().runTaskAsynchronously(IslandPlots.instance, new ChunkPopulator(world, chunk, rnd, y));
+			Thread.sleep(100L);
+		}
 		
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SendSyncMessage(player, ChatColor.GOLD+"Finding safe spawn point..."));
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncTeleport());

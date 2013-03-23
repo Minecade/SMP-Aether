@@ -9,6 +9,11 @@ import org.bukkit.generator.BlockPopulator;
 
 public class OrePopulator extends BlockPopulator
 {
+	public OrePopulator(World world)
+	{
+		
+	}
+	
 	private void createClump(World world, Material oreType, int size, int x, int y, int z, Random random)
 	{
 		float f = random.nextFloat() * 3.141593F;

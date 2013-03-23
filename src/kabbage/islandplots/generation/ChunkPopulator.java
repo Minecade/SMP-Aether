@@ -4,18 +4,18 @@ import java.util.Random;
 
 import kabbage.islandplots.IslandPlots;
 
-import net.minecraft.server.v1_5_R1.ChunkSection;
-import net.minecraft.server.v1_5_R1.WorldGenCaves;
-import net.minecraft.server.v1_5_R1.WorldGenDungeons;
+import net.minecraft.server.v1_5_R2.ChunkSection;
+import net.minecraft.server.v1_5_R2.WorldGenCaves;
+import net.minecraft.server.v1_5_R2.WorldGenDungeons;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_5_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class ChunkPopulator
+public class ChunkPopulator extends BukkitRunnable
 {
 	World world;
 	Chunk chunk;
@@ -36,13 +36,25 @@ public class ChunkPopulator
 		islandHeight = y;
 	}
 	
-	public void populate() throws InterruptedException
+	@Override
+	public void run()
 	{
-		net.minecraft.server.v1_5_R1.World nmsWorld = ((CraftWorld) world).getHandle();
+		try
+		{
+			runWithThrows();
+		} catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void runWithThrows() throws InterruptedException
+	{
+		net.minecraft.server.v1_5_R2.World nmsWorld = ((CraftWorld) world).getHandle();
 		
 		byte[] blocks = new byte[32768];
 		for(int i = 0; i < blocks.length; i++) blocks[i] = 1;
-		for(int i = 0; i < 8; i++)	//Caves don't generate often enough if we only run it once
+		for(int i = 0; i < 12; i++)	//Caves don't generate often enough if we only run it once
 			new WorldGenCaves().a(nmsWorld.chunkProvider, nmsWorld, chunk.getX() + i * 16, chunk.getZ() + i * 16, blocks);
 		
 		byte[][] chunkBlocks = new byte[8][4096];
@@ -57,7 +69,7 @@ public class ChunkPopulator
 			}
 		}
 		
-		net.minecraft.server.v1_5_R1.Chunk nmsChunk = new net.minecraft.server.v1_5_R1.Chunk(nmsWorld, chunk.getX(), chunk.getZ());
+		net.minecraft.server.v1_5_R2.Chunk nmsChunk = new net.minecraft.server.v1_5_R2.Chunk(nmsWorld, chunk.getX(), chunk.getZ());
 		ChunkSection[] csect = nmsChunk.i();
 		for (int sec = 0; sec < chunkBlocks.length; sec++)
 		{
@@ -79,29 +91,29 @@ public class ChunkPopulator
 		}
 		IslandGenerator.SetSyncBlocks setBlocks = new IslandGenerator.SetSyncBlocks(chunk, bTypes);
 		Bukkit.getScheduler().runTask(IslandPlots.instance, setBlocks);
-		while(!setBlocks.isDone) Thread.sleep(50l);
+		while(!setBlocks.isDone) Thread.sleep(10l);
+		
+		for(int i = 0; i < 6; i++)
+			new WorldGenDungeons().a(((CraftWorld) world).getHandle(), rnd, chunk.getX() << 4, islandHeight - rnd.nextInt(4) - i*4, chunk.getZ() << 4);
 		
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(LakePopulator.class));
-		while(!isPopulateDone) Thread.sleep(50l);
+		while(!isPopulateDone) Thread.sleep(10l);
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(GrassPopulator.class));
-		while(!isPopulateDone) Thread.sleep(50l);
+		while(!isPopulateDone) Thread.sleep(10l);
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(FlowerPopulator.class));
-		while(!isPopulateDone) Thread.sleep(50l);
+		while(!isPopulateDone) Thread.sleep(10l);
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(PumpkinPopulator.class));
-		while(!isPopulateDone) Thread.sleep(50l);
+		while(!isPopulateDone) Thread.sleep(10l);
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(OrePopulator.class));
-		while(!isPopulateDone) Thread.sleep(50l);
+		while(!isPopulateDone) Thread.sleep(10l);
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(TreePopulator.class));
-		while(!isPopulateDone) Thread.sleep(50l);
+		while(!isPopulateDone) Thread.sleep(10l);
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(SnowPopulator.class));
-		while(!isPopulateDone) Thread.sleep(50l);
+		while(!isPopulateDone) Thread.sleep(10l);
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(MushroomPopulator.class));
-		while(!isPopulateDone) Thread.sleep(50l);
+		while(!isPopulateDone) Thread.sleep(10l);
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(CactusPopulator.class));
-		while(!isPopulateDone) Thread.sleep(50l);
-		
-		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncDungeonGenerate());
-		while(!isPopulateDone) Thread.sleep(50l);
+		while(!isPopulateDone) Thread.sleep(10l);
 	}
 	
 	class SyncPopulate extends BukkitRunnable
@@ -123,18 +135,6 @@ public class ChunkPopulator
 			{
 				e.printStackTrace();
 			}
-			isPopulateDone = true;
-		}
-	}
-	
-	class SyncDungeonGenerate extends BukkitRunnable
-	{
-		@Override
-		public void run()
-		{
-			isPopulateDone = false;
-			for(int i = 0; i < 6; i++)
-				new WorldGenDungeons().a(((CraftWorld) world).getHandle(), rnd, chunk.getX() << 4, islandHeight - rnd.nextInt(4) - i*4, chunk.getZ() << 4);
 			isPopulateDone = true;
 		}
 	}
