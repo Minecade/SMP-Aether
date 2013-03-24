@@ -81,7 +81,7 @@ public class ChunkPopulator
 		Bukkit.getScheduler().runTask(IslandPlots.instance, setBlocks);
 		while(!setBlocks.isDone) Thread.sleep(10l);
 		
-		for(int i = 0; i < 6; i++)
+		for(int i = 0; i < 12; i++)
 			new WorldGenDungeons().a(((CraftWorld) world).getHandle(), rnd, chunk.getX() << 4, islandHeight - rnd.nextInt(4) - i*4, chunk.getZ() << 4);
 		
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(LakePopulator.class));

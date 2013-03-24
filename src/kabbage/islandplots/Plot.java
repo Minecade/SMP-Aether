@@ -82,7 +82,11 @@ public class Plot implements Externalizable
 	/**
 	 * Empty constructor for externalization
 	 */
-	public Plot() {}
+	public Plot()
+	{
+		if(region == null)
+			buildRegion();
+	}
 	
 	Plot(String world, String owner, int gridX, int gridY)
 	{
@@ -94,19 +98,7 @@ public class Plot implements Externalizable
 		level = 0;
 		wealth = 0;
 		
-		RegionManager manager = IslandPlots.instance.getRedProtect().getGlobalRegionManager();
-		Location topCorner = new Location(Bukkit.getWorld(world), getX() + PlotHandler.PLOT_SIZE / 2 - 1, 256, getZ() + PlotHandler.PLOT_SIZE / 2 - 1);
-		Location bottomCorner = new Location(Bukkit.getWorld(world), getX() - PlotHandler.PLOT_SIZE / 2, 0, getZ() - PlotHandler.PLOT_SIZE / 2);
-		RegionBuilder builder = new DefineRegionBuilder(Bukkit.getPlayer(owner), topCorner, bottomCorner, "Plot "+gridX+":"+gridY, owner);
-		region = builder.build();
-		Region current = manager.getRegion(new Location(Bukkit.getWorld(world), getX(), 64, getZ()));
-		if(current != null)
-			manager.remove(current);
-		try
-		{
-			manager.add(region, Bukkit.getWorld(world));
-		} catch(NullPointerException e)
-		{}
+		buildRegion();
 		
 		island = new Island(world, getX(), 80, getZ());
 		island.generate(owner);
@@ -121,6 +113,23 @@ public class Plot implements Externalizable
 	{
 		members.add(name);
 		region.addMember(name);
+	}
+	
+	private void buildRegion()
+	{
+		RegionManager manager = IslandPlots.instance.getRedProtect().getGlobalRegionManager();
+		Location topCorner = new Location(Bukkit.getWorld(world), getX() + PlotHandler.PLOT_SIZE / 2 - 1, 256, getZ() + PlotHandler.PLOT_SIZE / 2 - 1);
+		Location bottomCorner = new Location(Bukkit.getWorld(world), getX() - PlotHandler.PLOT_SIZE / 2, 0, getZ() - PlotHandler.PLOT_SIZE / 2);
+		RegionBuilder builder = new DefineRegionBuilder(Bukkit.getPlayer(owner), topCorner, bottomCorner, "Plot "+x+":"+y, owner);
+		region = builder.build();
+		Region current = manager.getRegion(new Location(Bukkit.getWorld(world), getX(), 64, getZ()));
+		if(current != null)
+			manager.remove(current);
+		try
+		{
+			manager.add(region, Bukkit.getWorld(world));
+		} catch(NullPointerException e)
+		{}
 	}
 	
 	/**

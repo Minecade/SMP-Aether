@@ -31,7 +31,7 @@ public class GenerationQueue
 	
 	public boolean isEmpty()
 	{
-		return queue.isEmpty();
+		return queue.isEmpty() && current == null;
 	}
 	
 	class QueueHandler extends BukkitRunnable
@@ -39,6 +39,8 @@ public class GenerationQueue
 		@Override
 		public void run()
 		{
+			if(current != null && !current.running)
+				current = null;
 			if(queue.isEmpty())
 				return;
 			if(current != null && current.running)

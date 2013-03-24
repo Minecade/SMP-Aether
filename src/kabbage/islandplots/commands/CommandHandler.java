@@ -179,6 +179,12 @@ public class CommandHandler
 			senderWrapper.sendMessage(ChatColor.RED+"Specified plot could not be found.");
 			return;
 		}
+		if(!plot.getOwner().equals(player.getName()))
+		{
+			homeOwner.removePlot(plot);
+			senderWrapper.sendMessage(ChatColor.RED+"Error. Try again later.");
+			return;
+		}
 		player.teleport(plot.getIsland().getSpawnPoint());
 	}
 }
