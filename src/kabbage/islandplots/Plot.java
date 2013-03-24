@@ -52,6 +52,10 @@ public class Plot implements Externalizable
 		blockWorths.put(Material.QUARTZ_BLOCK, 100);
 		blockWorths.put(Material.QUARTZ_STAIRS, 100);
 		blockWorths.put(Material.WOOL, 10);
+		blockWorths.put(Material.SMOOTH_BRICK, 32);
+		blockWorths.put(Material.SMOOTH_STAIRS, 32);
+		blockWorths.put(Material.WOOD_STEP, 4);
+		blockWorths.put(Material.STEP, 4);
 		
 		blockBreakWorths.put(Material.COAL_ORE, 10);
 		blockBreakWorths.put(Material.REDSTONE_ORE, 20);
@@ -82,11 +86,7 @@ public class Plot implements Externalizable
 	/**
 	 * Empty constructor for externalization
 	 */
-	public Plot()
-	{
-		if(region == null)
-			buildRegion();
-	}
+	public Plot() {}
 	
 	Plot(String world, String owner, int gridX, int gridY)
 	{
@@ -112,19 +112,19 @@ public class Plot implements Externalizable
 	public void addMember(String name)
 	{
 		members.add(name);
-		region.addMember(name);
+		getRegion().addMember(name);
 	}
 	
 	private void buildRegion()
 	{
 		RegionManager manager = IslandPlots.instance.getRedProtect().getGlobalRegionManager();
+		Region current = manager.getRegion(new Location(Bukkit.getWorld(world), getX(), 64, getZ()));
+		if(current != null)
+			manager.remove(current);
 		Location topCorner = new Location(Bukkit.getWorld(world), getX() + PlotHandler.PLOT_SIZE / 2 - 1, 256, getZ() + PlotHandler.PLOT_SIZE / 2 - 1);
 		Location bottomCorner = new Location(Bukkit.getWorld(world), getX() - PlotHandler.PLOT_SIZE / 2, 0, getZ() - PlotHandler.PLOT_SIZE / 2);
 		RegionBuilder builder = new DefineRegionBuilder(Bukkit.getPlayer(owner), topCorner, bottomCorner, "Plot "+x+":"+y, owner);
 		region = builder.build();
-		Region current = manager.getRegion(new Location(Bukkit.getWorld(world), getX(), 64, getZ()));
-		if(current != null)
-			manager.remove(current);
 		try
 		{
 			manager.add(region, Bukkit.getWorld(world));
@@ -212,6 +212,10 @@ public class Plot implements Externalizable
 	 */
 	public Region getRegion()
 	{
+		if(region == null)
+			region = IslandPlots.instance.getRedProtect().getGlobalRegionManager().getRegion(new Location(Bukkit.getWorld(world), getX(), 64, getZ()));
+		if(region == null)
+			buildRegion();
 		return region;
 	}
 	
@@ -253,7 +257,7 @@ public class Plot implements Externalizable
 	public void removeMember(String name)
 	{
 		members.remove(name);
-		region.removeMember(name);
+		getRegion().removeMember(name);
 	}
 	
 	@Override
