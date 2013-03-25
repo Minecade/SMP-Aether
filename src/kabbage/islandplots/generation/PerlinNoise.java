@@ -150,10 +150,12 @@ public class PerlinNoise
 	
 	public float islandNoise(float x, float z, int octaves, float persistence)
 	{
-		float noise = perlinNoise(x, z, octaves, persistence);
+		float noise = perlinNoise(x, z, octaves, persistence) + .5f;
 		float distFromCenterNormalized = (float) Math.sqrt(Math.pow(x / (width), 2) + Math.pow(z / (height), 2));
-		if(distFromCenterNormalized < .15)	//Make the center more mountainy
-			noise += .15 - distFromCenterNormalized;
+		if(distFromCenterNormalized < .2)	//Make the center more mountainy
+			noise += .2 - distFromCenterNormalized;
+		if(distFromCenterNormalized < .05 && noise < 0)
+			noise = .05f;
 		distFromCenterNormalized = (float) Math.pow(distFromCenterNormalized, .75);	//Makes the effect increase much more as you get further away from center
 		noise -= distFromCenterNormalized * 1.6;
 		return noise;

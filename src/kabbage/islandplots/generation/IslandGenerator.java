@@ -161,7 +161,7 @@ public class IslandGenerator extends BukkitRunnable
 				{
 					int worldX = i + a * 16;
 					int worldZ = k + b * 16;
-					float noiseVal = (float) (noise.islandNoise(worldX - x, worldZ - z, 5, 0.35f) + .5);	//Add .5 to initial noise to increase volume
+					float noiseVal = noise.islandNoise(worldX - x, worldZ - z, 5, 0.35f);
 					Biome biome = biomes[i][k];
 					boolean doBottom = false;
 					int sectionHeight = (int) (noiseVal * height);
@@ -265,8 +265,12 @@ public class IslandGenerator extends BukkitRunnable
 		@Override
 		public void run()
 		{
-			Player playerTele = Bukkit.getPlayer(player);
-			if(player != null) playerTele.teleport(island.getSpawnPoint());
+			try 
+			{
+				Player playerTele = Bukkit.getPlayer(player);
+				if(player != null) playerTele.teleport(island.getSpawnPoint());
+			} catch(NullPointerException e)
+			{} //Null points keep coming up when the player isn't online, even with the null check...
 		}
 	}
 	

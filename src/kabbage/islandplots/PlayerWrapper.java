@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -51,7 +52,17 @@ public class PlayerWrapper implements Externalizable
 		int size = plotsOwned.size();
 		if(size == 0)
 			return true;
+		int totalLevel = 0;
+		for(Plot p : plotsOwned) totalLevel += p.getLevel();
+		int requiredLevel = getRequiredLevel();
+		if(totalLevel >= requiredLevel)
+			return true;
 		return false;
+	}
+	
+	public int getRequiredLevel()
+	{
+		return (int) (Math.pow(plotsOwned.size(), 2.5) + plotsOwned.size() * 4);
 	}
 	
 	public Player getPlayer()
@@ -73,7 +84,18 @@ public class PlayerWrapper implements Externalizable
 	
 	public void removePlot(Plot p)
 	{
-		plotsOwned.remove(p);
+		Stack<Plot> toRemove = new Stack<Plot>();
+		for(Plot other : plotsOwned)
+		{
+			if(other.getGridLocation().equals(p.getGridLocation()))
+				toRemove.add(other);
+		}
+		plotsOwned.removeAll(toRemove);
+	}
+	
+	public boolean isOwnedPlot(Plot p)
+	{
+		return plotsOwned.contains(p);
 	}
 	
 	public static PlayerWrapper getWrapper(String player)
@@ -97,6 +119,15 @@ public class PlayerWrapper implements Externalizable
 		{
 			playerName = in.readUTF();
 			plotsOwned = (List<Plot>) in.readObject();
+			Stack<Plot> toRemove = new Stack<Plot>();
+			for(Plot p : plotsOwned)
+			{
+				if(IslandPlots.instance.getPlotHandler().plotGrid.contains(p.getGridX(), p.getGridY()))
+					toRemove.add(p);
+				else
+					IslandPlots.instance.getPlotHandler().plotGrid.put(p.getGridX(), p.getGridY(), p);
+			}
+			plotsOwned.removeAll(toRemove);
 		} else
 		{
 			IslandPlots.log(Level.WARNING, "Unsupported version of an Island failed to load.");

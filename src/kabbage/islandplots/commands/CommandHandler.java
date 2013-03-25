@@ -31,6 +31,7 @@ public class CommandHandler
 	public void abandonPlot()
 	{
 		Player player = senderWrapper.getPlayer();
+		PlayerWrapper pw = PlayerWrapper.getWrapper(player);
 		Plot plot = plugin.getPlotHandler().getPlot(player.getLocation());
 		if(plot == null)
 		{
@@ -39,14 +40,26 @@ public class CommandHandler
 		}
 		if(!plot.getOwner().equals(player.getName()))
 		{
-			senderWrapper.sendMessage(ChatColor.RED+"You don't own this plot.");
+			if(pw.isOwnedPlot(plot))
+			{
+				pw.removePlot(plot);
+				senderWrapper.sendMessage(ChatColor.RED+"You don't own this plot, but it seems as though you have one of your homes set as it.");
+				senderWrapper.sendMessage(ChatColor.RED+"This is now fixed.");
+			} else
+			{
+				senderWrapper.sendMessage(ChatColor.RED+"You don't own this plot.");
+			}
 			return;
 		}
 		if(plugin.getPlotHandler().needConfirmationUntiDeletion.contains(plot))
 		{
-			player.teleport(Bukkit.getWorld(plugin.getConfig().getString("spawn-world")).getSpawnLocation());
-			PlayerWrapper.getWrapper(player).reset();
+			plugin.getPlotHandler().removePlot(plot);
 			senderWrapper.sendMessage(ChatColor.RED+"Plot abandoned.");
+			
+			if(pw.getPlot(0) != null)
+				player.teleport(pw.getPlot(0).getSpawnPoint());
+			else
+				player.teleport(Bukkit.getWorld(plugin.getConfig().getString("spawn-world")).getSpawnLocation());
 		} else
 		{
 			senderWrapper.sendMessage(ChatColor.RED+"Are you absolutely positive you wish to abandon this plot? The action is irreversible.");
@@ -86,9 +99,10 @@ public class CommandHandler
 	public void createPlot()
 	{
 		String playerName = senderWrapper.getPlayer().getName();
-		if(!PlayerWrapper.getWrapper(playerName).canHavePlot())
+		PlayerWrapper pw = PlayerWrapper.getWrapper(playerName);
+		if(!pw.canHavePlot())
 		{
-			senderWrapper.sendMessage(ChatColor.RED+"You may only have one plot.");
+			senderWrapper.sendMessage(ChatColor.RED+"You require a total level across all owned plots of "+pw.getRequiredLevel()+" to get a new plot.");
 			return;
 		}
 		if(plugin.getGenerationQueue().isFull())
@@ -99,23 +113,6 @@ public class CommandHandler
 		if(!plugin.getGenerationQueue().isEmpty())
 			senderWrapper.sendMessage(ChatColor.GOLD+"Your plot is now queued for creation. You will be informed when your plot is next in queue.");
 		plugin.getPlotHandler().appendPlot(playerName);
-	}
-	
-	public void fixPlayer(String player)
-	{
-		if(!Permissions.isAdmin(senderWrapper.getSender()))
-		{
-			senderWrapper.sendMessage(ChatColor.RED+"You do not have permission to do this.");
-			return;
-		}
-		PlayerWrapper pw = PlayerWrapper.getWrapper(player);
-		if(pw == null)
-		{
-			senderWrapper.sendMessage(ChatColor.RED+"Player not found.");
-			return;
-		}
-		pw.reset();
-		senderWrapper.sendMessage(ChatColor.GOLD+"Player 'fixed'. Probably...");
 	}
 	
 	public void listHomes()
@@ -131,7 +128,7 @@ public class CommandHandler
 			//Args: Color, plot number, color, grid loc x, grid loc y
 			senderWrapper.sendMessage(String.format("%sPlot %d: %s[%d, %d]", ChatColor.DARK_AQUA, i+1, ChatColor.DARK_GRAY, p.getGridX(), p.getGridY()));
 		}
-		senderWrapper.sendMessage(String.format("Page %d/%d", page + 1, playerW.getPlots() / 5 + 1));
+		senderWrapper.sendMessage(String.format("Page %d/%d", page + 1, (playerW.getPlots()-1) / 5 + 1));
 	}
 	
 	public void removePlayer(String playerName)

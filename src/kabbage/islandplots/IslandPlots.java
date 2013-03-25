@@ -60,8 +60,8 @@ public class IslandPlots extends JavaPlugin
 		pListener.registerEvents(pm, this);
 		bListener.registerEvents(pm, this);
 		
-		loadPlayerWrappers();
 		loadPlotHandler();
+		loadPlayerWrappers();
 		
 		generationQueue = new GenerationQueue();
 	}

@@ -57,9 +57,6 @@ public class IslandPlotCommands implements CommandExecutor
 			} else if(commandBase.equalsIgnoreCase("removemember"))
 			{
 				handler.removePlayer(command.get(2));
-			} else if(commandBase.equalsIgnoreCase("fixplayer"))
-			{
-				handler.fixPlayer(command.get(2));
 			} else
 			{
 				hardFailure = true;

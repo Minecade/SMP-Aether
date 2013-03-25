@@ -17,7 +17,7 @@ public class Island implements Externalizable
 	private static final int VERSION = 1;
 	private static final int CHUNK_WIDTH = 16;
 	private static final int CHUNK_LENGTH = 16;
-	private static final int HEIGHT = 32;
+	private static final int HEIGHT = 36;
 	
 	String world;
 	int x;

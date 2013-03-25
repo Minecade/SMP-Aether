@@ -25,11 +25,11 @@ public class PlotHandler implements Externalizable
 	static final int PLOT_PADDING = 100;
 	
 	private String world;
-	private volatile Table<Integer, Integer, Plot> plotGrid;
+	Table<Integer, Integer, Plot> plotGrid;
 	
 	//List of plots people have tried to delete, but they still need to type the command a second time to confirm the deletion.
 	//Periodically cleared
-	public volatile List<Plot> needConfirmationUntiDeletion = new ArrayList<Plot>();
+	public List<Plot> needConfirmationUntiDeletion = new ArrayList<Plot>();
 	
 	/**
 	 * Empty constructor for externalization
@@ -83,8 +83,8 @@ public class PlotHandler implements Externalizable
 	{
 		if(plot.getRegion() != null)
 			IslandPlots.instance.getRedProtect().getGlobalRegionManager().remove(plot.getRegion());
-		plotGrid.remove(plot.getGridX(), plot.getGridX());
 		PlayerWrapper.getWrapper(plot.getOwner()).removePlot(plot);
+		plotGrid.remove(plot.getGridX(), plot.getGridY());
 	}
 	
 	/**
@@ -149,7 +149,7 @@ public class PlotHandler implements Externalizable
 		} else if(ver == 3)
 		{
 			world = in.readUTF();
-			plotGrid = (Table<Integer, Integer, Plot>) in.readObject();
+			plotGrid = TreeBasedTable.create();
 		} else
 		{
 			IslandPlots.log(Level.WARNING, "Unsupported version of the PlotHandler failed to load.");
@@ -162,6 +162,5 @@ public class PlotHandler implements Externalizable
 		out.writeInt(VERSION);
 		
 		out.writeUTF(world);
-		out.writeObject(plotGrid);
 	}
 }
