@@ -21,6 +21,8 @@ public class PlotHandler implements Externalizable
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
 	private static final int VERSION = 3;
 	
+	private transient IslandPlots plugin;
+	
 	static final int PLOT_SIZE = 300;
 	static final int PLOT_PADDING = 100;
 	
@@ -36,6 +38,7 @@ public class PlotHandler implements Externalizable
 	 */
 	public PlotHandler()
 	{
+		plugin = IslandPlots.instance;
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(IslandPlots.instance, new Runnable()
 		{
 			@Override
@@ -76,6 +79,8 @@ public class PlotHandler implements Externalizable
 			}
 		}
 		PlayerWrapper.getWrapper(owner).addPlot(plot);
+		plugin.savePlayerWrappers(false);
+		plugin.savePlotHandler(false);
 		return plot;
 	}
 	
@@ -149,7 +154,8 @@ public class PlotHandler implements Externalizable
 		} else if(ver == 3)
 		{
 			world = in.readUTF();
-			plotGrid = TreeBasedTable.create();
+			plotGrid = (Table<Integer, Integer, Plot>) in.readObject();
+			for(Plot p : plotGrid.values()) PlayerWrapper.getWrapper(p.getOwner()).addPlot(p);
 		} else
 		{
 			IslandPlots.log(Level.WARNING, "Unsupported version of the PlotHandler failed to load.");
@@ -162,5 +168,6 @@ public class PlotHandler implements Externalizable
 		out.writeInt(VERSION);
 		
 		out.writeUTF(world);
+		out.writeObject(plotGrid);
 	}
 }

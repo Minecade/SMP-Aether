@@ -13,6 +13,7 @@ import kabbage.islandplots.commands.IslandPlotCommands;
 import kabbage.islandplots.listeners.BlockListener;
 import kabbage.islandplots.listeners.PlayerListener;
 import kabbage.islandplots.utils.Constants;
+import kabbage.islandplots.utils.Utils;
 
 import kabbage.islandplots.generation.GenerationQueue;
 import kabbage.islandplots.generation.NullChunkGenerator;
@@ -24,6 +25,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.OverCaste.plugin.RedProtect.RedProtect;
+import com.google.common.io.Files;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 
 public class IslandPlots extends JavaPlugin
@@ -60,8 +62,8 @@ public class IslandPlots extends JavaPlugin
 		pListener.registerEvents(pm, this);
 		bListener.registerEvents(pm, this);
 		
-		loadPlotHandler();
 		loadPlayerWrappers();
+		loadPlotHandler();
 		
 		generationQueue = new GenerationQueue();
 	}
@@ -71,8 +73,8 @@ public class IslandPlots extends JavaPlugin
 	{
 		saveConfig();
 		
-		savePlayerWrappers();
-		savePlotHandler();
+		savePlayerWrappers(true);
+		savePlotHandler(true);
 	}
 	
 	public MultiverseCore getMultiverse()
@@ -148,17 +150,35 @@ public class IslandPlots extends JavaPlugin
         } catch (Exception e)
         {
         	log(Level.WARNING, "Couldn't load the PlotHandler database. Ignore if the island world has not yet been created.");
-        	e.printStackTrace();
         }
 	}
 	
-	private void savePlayerWrappers()
+	void savePlayerWrappers(boolean backup)
 	{
 		File path = new File(Constants.PLAYERS_PATH);
-		new File(Constants.PLUGIN_PATH).mkdir();
+		File[] backups = new File[5];
+		backups[0] = path;
+		
+		for(int i = 1; i < 5; i++)
+		{
+			backups[i] = new File(Constants.PLUGIN_PATH+File.separator+"playersbackup"+ i +".ext");
+		}
 		
 		try
 		{
+			if(backup)
+			{
+				//If the two files are equal, there's no need for a backup
+				if(!Utils.fileEquals(backups[0], backups[1]))
+				{
+					for(int i = 4; i > 0; i--)
+					{
+						if(backups[i - 1].exists())
+							Files.move(backups[i - 1], backups[i]);
+					}
+				}
+			}
+
 			path.createNewFile();
 			FileOutputStream fos = new FileOutputStream(path);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -175,15 +195,33 @@ public class IslandPlots extends JavaPlugin
         }
 	}
 	
-	private void savePlotHandler()
+	void savePlotHandler(boolean backup)
 	{
 		if(plotHandler == null)
 			return;
 		File path = new File(Constants.PLOT_PATH);
-		new File(Constants.PLUGIN_PATH).mkdir();
+		File[] backups = new File[5];
+		backups[0] = path;
+		
+		for(int i = 1; i < 5; i++)
+		{
+			backups[i] = new File(Constants.PLUGIN_PATH+File.separator+"islandsbackup"+ i +".ext");
+		}
 		
 		try
 		{
+			if(backup)
+			{
+				//If the two files are equal, there's no need for a backup
+				if(!Utils.fileEquals(backups[0], backups[1]))
+				{
+					for(int i = 4; i > 0; i--)
+					{
+						if(backups[i - 1].exists())
+							Files.move(backups[i - 1], backups[i]);
+					}
+				}
+			}
 			path.createNewFile();
 			FileOutputStream fos = new FileOutputStream(path);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);

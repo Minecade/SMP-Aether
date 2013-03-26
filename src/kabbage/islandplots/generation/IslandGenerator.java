@@ -83,7 +83,7 @@ public class IslandGenerator extends BukkitRunnable
 			{
 				chunksDone++;
 				Bukkit.getScheduler().runTaskAsynchronously(IslandPlots.instance, new GenerateChunk(noise, a, b));
-				Thread.sleep(50L);
+				Thread.sleep(60L);
 			}
 		}
 		while(toPopulate.size() < chunksDone)

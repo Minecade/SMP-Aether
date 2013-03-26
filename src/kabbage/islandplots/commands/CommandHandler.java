@@ -102,7 +102,8 @@ public class CommandHandler
 		PlayerWrapper pw = PlayerWrapper.getWrapper(playerName);
 		if(!pw.canHavePlot())
 		{
-			senderWrapper.sendMessage(ChatColor.RED+"You require a total level across all owned plots of "+pw.getRequiredLevel()+" to get a new plot.");
+			//senderWrapper.sendMessage(ChatColor.RED+"You require a total level across all owned plots of "+pw.getRequiredLevel()+" to get a new plot.");
+			senderWrapper.sendMessage(ChatColor.RED+"You may only have one plot.");
 			return;
 		}
 		if(plugin.getGenerationQueue().isFull())

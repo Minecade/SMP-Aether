@@ -42,7 +42,7 @@ public class ChunkPopulator
 		
 		byte[] blocks = new byte[32768];
 		for(int i = 0; i < blocks.length; i++) blocks[i] = 1;
-		for(int i = 0; i < 12; i++)	//Caves don't generate often enough if we only run it once
+		for(int i = 0; i < 14; i++)	//Caves don't generate often enough if we only run it once
 			new WorldGenCaves().a(nmsWorld.chunkProvider, nmsWorld, chunk.getX() + i * 16, chunk.getZ() + i * 16, blocks);
 		
 		byte[][] chunkBlocks = new byte[8][4096];
@@ -81,8 +81,8 @@ public class ChunkPopulator
 		Bukkit.getScheduler().runTask(IslandPlots.instance, setBlocks);
 		while(!setBlocks.isDone) Thread.sleep(10l);
 		
-		for(int i = 0; i < 12; i++)
-			new WorldGenDungeons().a(((CraftWorld) world).getHandle(), rnd, chunk.getX() << 4, islandHeight - rnd.nextInt(4) - i*4, chunk.getZ() << 4);
+		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncGenerateDungeons());
+		while(!isPopulateDone) Thread.sleep(10l);
 		
 		Bukkit.getScheduler().runTask(IslandPlots.instance, new SyncPopulate(LakePopulator.class));
 		while(!isPopulateDone) Thread.sleep(10l);
@@ -123,6 +123,18 @@ public class ChunkPopulator
 			{
 				e.printStackTrace();
 			}
+			isPopulateDone = true;
+		}
+	}
+	
+	class SyncGenerateDungeons extends BukkitRunnable
+	{
+		@Override
+		public void run()
+		{
+			isPopulateDone = false;
+			for(int i = 0; i < 12; i++)
+				new WorldGenDungeons().a(((CraftWorld) world).getHandle(), rnd, chunk.getX() << 4, islandHeight - rnd.nextInt(4) - i*4, chunk.getZ() << 4);
 			isPopulateDone = true;
 		}
 	}

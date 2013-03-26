@@ -56,7 +56,7 @@ public class PlayerWrapper implements Externalizable
 		for(Plot p : plotsOwned) totalLevel += p.getLevel();
 		int requiredLevel = getRequiredLevel();
 		if(totalLevel >= requiredLevel)
-			return true;
+			return false;
 		return false;
 	}
 	
@@ -110,7 +110,6 @@ public class PlayerWrapper implements Externalizable
 		return getWrapper(player.getName());
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
 	{
@@ -118,16 +117,7 @@ public class PlayerWrapper implements Externalizable
 		if(ver == 1)
 		{
 			playerName = in.readUTF();
-			plotsOwned = (List<Plot>) in.readObject();
-			Stack<Plot> toRemove = new Stack<Plot>();
-			for(Plot p : plotsOwned)
-			{
-				if(IslandPlots.instance.getPlotHandler().plotGrid.contains(p.getGridX(), p.getGridY()))
-					toRemove.add(p);
-				else
-					IslandPlots.instance.getPlotHandler().plotGrid.put(p.getGridX(), p.getGridY(), p);
-			}
-			plotsOwned.removeAll(toRemove);
+			plotsOwned = new ArrayList<Plot>();
 		} else
 		{
 			IslandPlots.log(Level.WARNING, "Unsupported version of an Island failed to load.");
@@ -140,7 +130,6 @@ public class PlayerWrapper implements Externalizable
 		out.writeInt(VERSION);
 		
 		out.writeUTF(playerName);
-		out.writeObject(plotsOwned);
 	}
 
 	public void reset()
