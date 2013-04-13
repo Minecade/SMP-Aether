@@ -45,6 +45,11 @@ public class PlotHandler implements Externalizable
 			public void run()
 			{
 				needConfirmationUntiDeletion.clear();
+				for(Plot p : plotGrid.values())
+				{
+					if(p.shouldRemove())
+						removePlot(p);
+				}
 			}
 		},1200L, 1200L);
 	}

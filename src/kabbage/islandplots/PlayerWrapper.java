@@ -5,11 +5,15 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+
+import kabbage.islandplots.utils.Permissions;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -17,12 +21,13 @@ import org.bukkit.entity.Player;
 public class PlayerWrapper implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
-	private static final int VERSION = 1;
+	private static final int VERSION = 2;
 	
 	static Map<String, PlayerWrapper> players = new HashMap<String, PlayerWrapper>();
 	
 	private String playerName;
 	private List<Plot> plotsOwned;
+	private long lastAbandon;
 	
 	/**
 	 * Empty constructor for externalization
@@ -33,6 +38,7 @@ public class PlayerWrapper implements Externalizable
 	{
 		this.playerName = playerName;
 		plotsOwned = new ArrayList<Plot>();
+		lastAbandon = 0L;
 		
 		players.put(playerName, this);
 	}
@@ -47,11 +53,19 @@ public class PlayerWrapper implements Externalizable
 		plotsOwned.add(plot);
 	}
 	
+	public boolean canAbandonPlot()
+	{
+		long timeSinceAbandon = new Date().getTime() - lastAbandon;
+		return TimeUnit.MILLISECONDS.toHours(timeSinceAbandon) >= 24;
+	}
+	
 	public boolean canHavePlot()
 	{
 		int size = plotsOwned.size();
 		if(size == 0)
 			return true;
+		if(size >= Permissions.maxPlots(getPlayer()))
+			return false;
 		int totalLevel = 0;
 		for(Plot p : plotsOwned) totalLevel += p.getLevel();
 		int requiredLevel = getRequiredLevel();
@@ -62,7 +76,7 @@ public class PlayerWrapper implements Externalizable
 	
 	public int getRequiredLevel()
 	{
-		return (int) (Math.pow(plotsOwned.size(), 2.5) + plotsOwned.size() * 4);
+		return (int) (Math.pow(plotsOwned.size(), 2) + plotsOwned.size() * 10 + 5);
 	}
 	
 	public Player getPlayer()
@@ -84,6 +98,7 @@ public class PlayerWrapper implements Externalizable
 	
 	public void removePlot(Plot p)
 	{
+		lastAbandon = new Date().getTime();
 		Stack<Plot> toRemove = new Stack<Plot>();
 		for(Plot other : plotsOwned)
 		{
@@ -118,6 +133,12 @@ public class PlayerWrapper implements Externalizable
 		{
 			playerName = in.readUTF();
 			plotsOwned = new ArrayList<Plot>();
+			lastAbandon = 0L;
+		} else if(ver == 2)
+		{
+			playerName = in.readUTF();
+			plotsOwned = new ArrayList<Plot>();
+			lastAbandon = in.readLong();
 		} else
 		{
 			IslandPlots.log(Level.WARNING, "Unsupported version of an Island failed to load.");
@@ -130,6 +151,7 @@ public class PlayerWrapper implements Externalizable
 		out.writeInt(VERSION);
 		
 		out.writeUTF(playerName);
+		out.writeLong(lastAbandon);
 	}
 
 	public void reset()

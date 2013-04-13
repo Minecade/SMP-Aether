@@ -51,6 +51,12 @@ public class CommandHandler
 			}
 			return;
 		}
+		if(!pw.canAbandonPlot())
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You may only abandon one plot every day, both to prevent abuse and to reduce the amount of time" +
+					"island generation takes.");
+			return;
+		}
 		if(plugin.getPlotHandler().needConfirmationUntiDeletion.contains(plot))
 		{
 			plugin.getPlotHandler().removePlot(plot);
@@ -102,8 +108,10 @@ public class CommandHandler
 		PlayerWrapper pw = PlayerWrapper.getWrapper(playerName);
 		if(!pw.canHavePlot())
 		{
-			//senderWrapper.sendMessage(ChatColor.RED+"You require a total level across all owned plots of "+pw.getRequiredLevel()+" to get a new plot.");
-			senderWrapper.sendMessage(ChatColor.RED+"You may only have one plot.");
+			if(pw.getPlots() >= Permissions.maxPlots(senderWrapper.getSender()))
+				senderWrapper.sendMessage(ChatColor.RED+"You may only have up to "+Permissions.maxPlots(senderWrapper.getSender())+" plots at a time.");
+			else
+				senderWrapper.sendMessage(ChatColor.RED+"You require a total level across all owned plots of "+pw.getRequiredLevel()+" to get a new plot.");
 			return;
 		}
 		if(plugin.getGenerationQueue().isFull())

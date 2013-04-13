@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -26,7 +28,7 @@ import kabbage.islandplots.utils.Coordinate;
 public class Plot implements Externalizable
 {
 	private static final long serialVersionUID = "PLAYERWRAPPER".hashCode();
-	private static final int VERSION = 3;
+	private static final int VERSION = 4;
 	
 	private static Map<Material, Integer> blockWorths;
 	private static Map<Material, Integer> blockBreakWorths;
@@ -38,6 +40,7 @@ public class Plot implements Externalizable
 		
 		blockWorths.put(Material.REDSTONE_BLOCK, 50);
 		blockWorths.put(Material.IRON_BLOCK, 100);
+		blockWorths.put(Material.LAPIS_BLOCK, 100);
 		blockWorths.put(Material.GOLD_BLOCK, 200);
 		blockWorths.put(Material.EMERALD_BLOCK, 400);
 		blockWorths.put(Material.DIAMOND_BLOCK, 750);
@@ -57,19 +60,23 @@ public class Plot implements Externalizable
 		blockWorths.put(Material.WOOD_STEP, 4);
 		blockWorths.put(Material.STEP, 4);
 		
-		blockBreakWorths.put(Material.COAL_ORE, 10);
-		blockBreakWorths.put(Material.REDSTONE_ORE, 20);
+		blockBreakWorths.put(Material.COAL_ORE, 20);
+		blockBreakWorths.put(Material.REDSTONE_ORE, 40);
 		blockBreakWorths.put(Material.IRON_ORE, 40);
 		blockBreakWorths.put(Material.QUARTZ_ORE, 40);
 		blockBreakWorths.put(Material.GOLD_ORE, 75);
+		blockBreakWorths.put(Material.LAPIS_ORE, 75);
 		blockBreakWorths.put(Material.EMERALD_ORE, 100);
 		blockBreakWorths.put(Material.DIAMOND_ORE, 200);
 		blockBreakWorths.put(Material.STONE, 1);
 		blockBreakWorths.put(Material.SAND, 1);
 		blockBreakWorths.put(Material.SANDSTONE, 2);
 		blockBreakWorths.put(Material.LOG, 3);
-		blockBreakWorths.put(Material.WHEAT, 5);
-		blockBreakWorths.put(Material.MELON_BLOCK, 10);
+		blockBreakWorths.put(Material.WHEAT, 15);
+		blockBreakWorths.put(Material.MELON_BLOCK, 25);
+		blockBreakWorths.put(Material.POTATO, 15);
+		blockBreakWorths.put(Material.CARROT, 15);
+		blockBreakWorths.put(Material.COCOA, 25);
 		blockBreakWorths.put(Material.OBSIDIAN, 25);
 	}
 	
@@ -82,6 +89,7 @@ public class Plot implements Externalizable
 	private Region region;
 	private int level;
 	private int wealth;
+	private long creationTime;
 	
 	/**
 	 * Empty constructor for externalization
@@ -97,6 +105,7 @@ public class Plot implements Externalizable
 		y = gridY;
 		level = 0;
 		wealth = 0;
+		creationTime = new Date().getTime();
 		
 		buildRegion();
 		
@@ -260,6 +269,25 @@ public class Plot implements Externalizable
 		getRegion().removeMember(name);
 	}
 	
+	/**
+	 * Whether or not this plot should be removed due to being abandoned. Based off of the current level
+	 * of the plot, and how long it's been in existence.
+	 * @return	whether or not to remove
+	 */
+	public boolean shouldRemove()
+	{
+		long timeExisted = new Date().getTime() - creationTime;
+		long hoursExisted = TimeUnit.MILLISECONDS.toHours(timeExisted);
+		if(hoursExisted >= 30 * 24)
+		{
+			if(level < 10) return true;
+		} else if(hoursExisted >= 7 * 24)
+		{
+			if(level < 5) return true;
+		}
+		return false;
+	}
+	
 	@Override
 	public String toString()
 	{
@@ -301,6 +329,18 @@ public class Plot implements Externalizable
 			island = (Island) in.readObject();
 			level = in.readInt();
 			wealth = in.readInt();
+			creationTime = new Date().getTime();
+		} else if(ver == 4)
+		{
+			world = in.readUTF();
+			owner = in.readUTF();
+			members = (List<String>) in.readObject();
+			x = in.readInt();
+			y = in.readInt();
+			island = (Island) in.readObject();
+			level = in.readInt();
+			wealth = in.readInt();
+			creationTime = in.readLong();
 		}
 		else
 			IslandPlots.log(Level.WARNING, "Unsupported version of a Plot failed to load.");
@@ -319,5 +359,6 @@ public class Plot implements Externalizable
 		out.writeObject(island);
 		out.writeInt(level);
 		out.writeInt(wealth);
+		out.writeLong(creationTime);
 	}
 }
