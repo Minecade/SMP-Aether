@@ -10,6 +10,7 @@ import kabbage.islandplots.generation.IslandGenerator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 
 public class Island implements Externalizable
 {
@@ -45,7 +46,14 @@ public class Island implements Externalizable
 	
 	public Location getSpawnPoint()
 	{
-		return Bukkit.getWorld(world).getHighestBlockAt(x, z).getLocation();
+		Location spawn = Bukkit.getWorld(world).getHighestBlockAt(x, z).getLocation();
+		if(spawn.getY() < 5)
+		{
+			spawn.setY(64);
+			spawn.getBlock().setType(Material.STONE);
+			spawn.setY(65);
+		}
+		return spawn;
 	}
 	
 	@Override

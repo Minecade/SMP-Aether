@@ -56,7 +56,9 @@ public class PlayerWrapper implements Externalizable
 	public boolean canAbandonPlot()
 	{
 		long timeSinceAbandon = new Date().getTime() - lastAbandon;
-		return TimeUnit.MILLISECONDS.toHours(timeSinceAbandon) >= 24;
+		//Math.abs is there in case the user screws up his/her system time, which could be disastrous without the Math.abs
+		//16 hours instead of 24 because I'm feeling generous
+		return Math.abs(TimeUnit.MILLISECONDS.toHours(timeSinceAbandon)) >= 16;
 	}
 	
 	public boolean canHavePlot()
@@ -70,7 +72,7 @@ public class PlayerWrapper implements Externalizable
 		for(Plot p : plotsOwned) totalLevel += p.getLevel();
 		int requiredLevel = getRequiredLevel();
 		if(totalLevel >= requiredLevel)
-			return false;
+			return true;
 		return false;
 	}
 	

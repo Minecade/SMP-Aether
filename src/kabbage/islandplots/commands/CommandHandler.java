@@ -54,7 +54,7 @@ public class CommandHandler
 		if(!pw.canAbandonPlot())
 		{
 			senderWrapper.sendMessage(ChatColor.RED+"You may only abandon one plot every day, both to prevent abuse and to reduce the amount of time" +
-					"island generation takes.");
+					" island generation takes.");
 			return;
 		}
 		if(plugin.getPlotHandler().needConfirmationUntiDeletion.contains(plot))

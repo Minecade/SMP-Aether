@@ -12,10 +12,9 @@ public enum Permissions
      * The node for admin commands. You get all below permissions if you have this
      */
     ADMIN,
-    /**
-     * Players who have permission for extra plots (5 specifically, as opposed to the default 2)
-     */
-    EXTRAPLOTS;
+    EXTRAPLOTS_2,
+    EXTRAPLOTS_3,
+    EXTRAPLOTS_4;
     
     @Override
     public String toString()
@@ -24,8 +23,12 @@ public enum Permissions
         {
             case ADMIN:
                 return "island.admin";
-            case EXTRAPLOTS:
-                return "island.extraplots";
+            case EXTRAPLOTS_2:
+                return "island.extraplots.2";
+            case EXTRAPLOTS_3:
+                return "island.extraplots.3";
+            case EXTRAPLOTS_4:
+                return "island.extraplots.4";
             default:
             	return null;
         }
@@ -39,7 +42,9 @@ public enum Permissions
         try
         {
             pm.addPermission(new Permission(ADMIN.toString()));
-            pm.addPermission(new Permission(EXTRAPLOTS.toString()));
+            pm.addPermission(new Permission(EXTRAPLOTS_2.toString()));
+            pm.addPermission(new Permission(EXTRAPLOTS_3.toString()));
+            pm.addPermission(new Permission(EXTRAPLOTS_4.toString()));
         } catch (Exception e)
         {
         }
@@ -53,7 +58,11 @@ public enum Permissions
     
     public static int maxPlots(Player player)
     {
-    	return hasExternalPermissions(player, Permissions.EXTRAPLOTS.toString(), true) || isAdmin(player) ? 5 : 2;
+    	return hasExternalPermissions(player, Permissions.EXTRAPLOTS_4.toString(), true) || isAdmin(player) ? 4 : 
+    		hasExternalPermissions(player, Permissions.EXTRAPLOTS_3.toString(), true) ? 3 :
+    			hasExternalPermissions(player, Permissions.EXTRAPLOTS_2.toString(), true) ? 2 :
+    				1;
+    				
     }
     
     public static boolean hasExternalPermissions(Player player, String node, boolean countOp)
@@ -68,7 +77,10 @@ public enum Permissions
     
     public static int maxPlots(CommandSender sender)
     {
-    	return hasExternalPermissions(sender, Permissions.EXTRAPLOTS.toString(), true) || isAdmin(sender) ? 5 : 2;
+    	return hasExternalPermissions(sender, Permissions.EXTRAPLOTS_4.toString(), true) || isAdmin(sender) ? 4 : 
+    		hasExternalPermissions(sender, Permissions.EXTRAPLOTS_3.toString(), true) ? 3 :
+    			hasExternalPermissions(sender, Permissions.EXTRAPLOTS_2.toString(), true) ? 2 :
+    				1;
     }
     
     public static boolean hasExternalPermissions(CommandSender sender, String node, boolean countOp)

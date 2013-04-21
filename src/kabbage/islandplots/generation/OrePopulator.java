@@ -63,8 +63,8 @@ public class OrePopulator extends BlockPopulator
 								if ((d13 * d13 + d14 * d14 + d15 * d15 >= 1.0D)|| (world.getBlockTypeIdAt(i3, i4, i5) != Material.STONE.getId()))
 									continue;
 								
-								//Don't let gravel hang out where it can fall
-								if(oreType == Material.GRAVEL && world.getBlockTypeIdAt(i3, i4 - 1, i5) != Material.STONE.getId())
+								//Don't let gravel/sand hang out where it can fall
+								if((oreType == Material.GRAVEL || oreType == Material.SAND) && world.getBlockTypeIdAt(i3, i4 - 1, i5) != Material.STONE.getId())
 									continue;
 								//Don't let lava be near the air at all
 								if(oreType == Material.LAVA)
@@ -92,13 +92,22 @@ public class OrePopulator extends BlockPopulator
 		int worldChunkX = chunk.getX() * 16;
 		int worldChunkZ = chunk.getZ() * 16;
 
-		for (i = 0; i < 14; ++i)
+		for (i = 0; i < 12; ++i)
 		{
 			x = worldChunkX + random.nextInt(16);
 			z = worldChunkZ + random.nextInt(16);
 			y = random.nextInt(100) + 16;
 
 			this.createClump(world, Material.GRAVEL, 32, x, y, z, random);
+		}
+		
+		for (i = 0; i < 8; ++i)
+		{
+			x = worldChunkX + random.nextInt(16);
+			z = worldChunkZ + random.nextInt(16);
+			y = random.nextInt(100) + 16;
+
+			this.createClump(world, Material.SAND, 32, x, y, z, random);
 		}
 
 		for (i = 0; i < 20; ++i)
