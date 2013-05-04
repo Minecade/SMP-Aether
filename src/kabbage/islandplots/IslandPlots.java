@@ -159,7 +159,7 @@ public class IslandPlots extends JavaPlugin
 		File[] backups = new File[5];
 		backups[0] = path;
 		
-		for(int i = 1; i < 5; i++)
+		for(int i = 1; i < 3; i++)
 		{
 			backups[i] = new File(Constants.PLUGIN_PATH+File.separator+"playersbackup"+ i +".ext");
 		}
@@ -171,7 +171,7 @@ public class IslandPlots extends JavaPlugin
 				//If the two files are equal, there's no need for a backup
 				if(!Utils.fileEquals(backups[0], backups[1]))
 				{
-					for(int i = 4; i > 0; i--)
+					for(int i = 2; i > 0; i--)
 					{
 						if(backups[i - 1].exists())
 							Files.move(backups[i - 1], backups[i]);
@@ -203,7 +203,7 @@ public class IslandPlots extends JavaPlugin
 		File[] backups = new File[5];
 		backups[0] = path;
 		
-		for(int i = 1; i < 5; i++)
+		for(int i = 1; i < 3; i++)
 		{
 			backups[i] = new File(Constants.PLUGIN_PATH+File.separator+"islandsbackup"+ i +".ext");
 		}
@@ -215,7 +215,7 @@ public class IslandPlots extends JavaPlugin
 				//If the two files are equal, there's no need for a backup
 				if(!Utils.fileEquals(backups[0], backups[1]))
 				{
-					for(int i = 4; i > 0; i--)
+					for(int i = 2; i > 0; i--)
 					{
 						if(backups[i - 1].exists())
 							Files.move(backups[i - 1], backups[i]);

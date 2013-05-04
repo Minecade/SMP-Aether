@@ -6,6 +6,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -45,11 +46,13 @@ public class PlotHandler implements Externalizable
 			public void run()
 			{
 				needConfirmationUntiDeletion.clear();
+				Stack<Plot> toRemove = new Stack<Plot>();
 				for(Plot p : plotGrid.values())
 				{
 					if(p.shouldRemove())
-						removePlot(p);
+						toRemove.push(p);
 				}
+				for(Plot p : toRemove) removePlot(p);
 			}
 		},1200L, 1200L);
 	}

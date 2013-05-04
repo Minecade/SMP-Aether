@@ -13,7 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_5_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_5_R3.CraftChunk;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -278,7 +278,7 @@ public class IslandGenerator extends BukkitRunnable
 	{
 		public volatile boolean isDone = false;
 		
-		net.minecraft.server.v1_5_R1.Chunk chunk;
+		net.minecraft.server.v1_5_R3.Chunk chunk;
 		byte[][][] blocks;
 		public SetSyncBlocks(Chunk chunk, byte[][][] blocks)
 		{
