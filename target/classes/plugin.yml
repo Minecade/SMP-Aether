@@ -1,0 +1,12 @@
+name: IslandPlots
+main: com.github.islandplots.IslandPlots
+author: kabbage
+version: 0.2
+depend: [Multiverse-Core, redProtect]
+load: STARTUP
+commands:
+    island:
+        description: The plugins basic command.
+        permissions:
+        usage: /is new|home|addmember|removemember|list|info|abandon|setworld
+        aliases: [is]
