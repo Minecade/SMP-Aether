@@ -109,7 +109,7 @@ public class Plot implements Externalizable
 
 		buildRegion();
 
-		island = new Island(world, getX(), 80, getZ());
+		island = new Island(this, world, getX(), 80, getZ());
 		island.generate(owner);
 	}
 
@@ -278,10 +278,13 @@ public class Plot implements Externalizable
 	{
 		long timeExisted = new Date().getTime() - creationTime;
 		long hoursExisted = TimeUnit.MILLISECONDS.toHours(timeExisted);
-		if(hoursExisted >= 30 * 24)
+		if(hoursExisted >= 50 * 24)
+		{
+			if(level < 20) return true;
+		} else if(hoursExisted >= 15 * 24)
 		{
 			if(level < 10) return true;
-		} else if(hoursExisted >= 7 * 24)
+		} else if(hoursExisted >= 5 * 24)
 		{
 			if(level < 5) return true;
 		}

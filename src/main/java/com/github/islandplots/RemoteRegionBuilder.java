@@ -100,7 +100,7 @@ public class RemoteRegionBuilder extends RegionBuilder
 		}
 		try
 		{
-			Field f = getClass().getDeclaredField("r");
+			Field f = RegionBuilder.class.getDeclaredField("r");
 			f.setAccessible(true);
 			f.set(this, r);
 		} catch(Exception e) {e.printStackTrace();}

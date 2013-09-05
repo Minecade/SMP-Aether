@@ -4,6 +4,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import com.github.islandplots.IslandPlots;
 
+import com.github.islandplots.PlotHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -46,6 +47,15 @@ public class GenerationQueue
 			if(current != null && current.running)
 				return;
 			current = queue.poll();
+			if(IslandPlots.instance.getEconomy().getBalance(current.player) < PlotHandler.PLOT_PRICE)
+			{
+				Player player = Bukkit.getPlayer(current.player);
+				if(player != null)
+					player.sendMessage(ChatColor.RED+"You no longer have enough money to buy your new island. Removed from generation queue.");
+				IslandPlots.instance.getPlotHandler().removePlot(current.island.getPlot());
+				return;
+			}
+			IslandPlots.instance.getEconomy().withdrawPlayer(current.player, PlotHandler.PLOT_PRICE);
 			Player player = Bukkit.getPlayer(current.player);
 			if(player != null)
 				player.sendMessage(ChatColor.GOLD+"Generation now beginning.");

@@ -9,6 +9,7 @@ import com.github.islandplots.PlotHandler;
 import com.github.islandplots.utils.Permissions;
 import com.github.islandplots.utils.Utils;
 
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -60,7 +61,8 @@ public class CommandHandler
 		if(plugin.getPlotHandler().needConfirmationUntiDeletion.contains(plot))
 		{
 			plugin.getPlotHandler().removePlot(plot);
-			senderWrapper.sendMessage(ChatColor.RED+"Plot abandoned.");
+			senderWrapper.sendMessage(ChatColor.RED+"Plot abandoned, cost refunded.");
+			plugin.getEconomy().depositPlayer(player.getName(), PlotHandler.PLOT_PRICE);
 
 			if(pw.getPlot(0) != null)
 				player.teleport(pw.getPlot(0).getSpawnPoint());
@@ -114,9 +116,21 @@ public class CommandHandler
 				senderWrapper.sendMessage(ChatColor.RED+"You require a total level across all owned plots of "+pw.getRequiredLevel()+" to get a new plot.");
 			return;
 		}
+		Economy economy = plugin.getEconomy();
+		if(economy.getBalance(playerName) < PlotHandler.PLOT_PRICE)
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"You don't have enough money to do this! A new island costs: "+PlotHandler.PLOT_PRICE);
+			return;
+		}
 		if(plugin.getGenerationQueue().isFull())
 		{
 			senderWrapper.sendMessage(ChatColor.RED+"Too many plots are already queued to be generated. Please try again later.");
+			return;
+		}
+		if(!plugin.getPlotHandler().needConfirmationUntiPurchase.contains(playerName))
+		{
+			senderWrapper.sendMessage(ChatColor.RED+"Buying a new island will cost "+PlotHandler.PLOT_PRICE+". Type the command again to confirm your purchase.");
+			plugin.getPlotHandler().needConfirmationUntiPurchase.add(playerName);
 			return;
 		}
 		if(!plugin.getGenerationQueue().isEmpty())
@@ -169,7 +183,7 @@ public class CommandHandler
 		senderWrapper.sendMessage(ChatColor.GOLD+"Owner: "+plot.getOwner());
 		List<String> members = plot.getMembers();
 		if(members.size() > 0)
-			senderWrapper.sendMessage(ChatColor.GOLD+"Members: "+members.toString().replaceAll("]|[", ""));
+			senderWrapper.sendMessage(ChatColor.GOLD+"Members: "+members.toString().replaceAll("[\\]|\\[]", ""));
 		senderWrapper.sendMessage(ChatColor.GOLD+"Level: "+plot.getLevel());
 		senderWrapper.sendMessage(ChatColor.GOLD+"Wealth: "+plot.getWealth()+"/"+plot.getNextWealth());
 	}

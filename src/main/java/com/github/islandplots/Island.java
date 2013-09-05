@@ -20,6 +20,7 @@ public class Island implements Externalizable
 	private static final int CHUNK_LENGTH = 16;
 	private static final int HEIGHT = 32;
 
+	Plot plot;
 	String world;
 	int x;
 	int y;
@@ -30,12 +31,18 @@ public class Island implements Externalizable
 	 */
 	public Island() {}
 
-	public Island(String world, int x, int y, int z)
+	public Island(Plot plot, String world, int x, int y, int z)
 	{
+		this.plot = plot;
 		this.world = world;
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+
+	public Plot getPlot()
+	{
+		return plot;
 	}
 
 	public void generate(String player)

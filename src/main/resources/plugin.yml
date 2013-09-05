@@ -3,7 +3,7 @@ main: com.github.islandplots.IslandPlots
 author: kabbage
 version: 0.2
 depend: [Multiverse-Core, redProtect]
-load: STARTUP
+load: POSTWORLD
 commands:
     island:
         description: The plugins basic command.

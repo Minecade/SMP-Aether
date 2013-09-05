@@ -26,6 +26,7 @@ public class PlotHandler implements Externalizable
 
 	static final int PLOT_SIZE = 300;
 	static final int PLOT_PADDING = 100;
+	public static final int PLOT_PRICE = 12000;
 
 	private String world;
 	Table<Integer, Integer, Plot> plotGrid;
@@ -33,6 +34,9 @@ public class PlotHandler implements Externalizable
 	//List of plots people have tried to delete, but they still need to type the command a second time to confirm the deletion.
 	//Periodically cleared
 	public List<Plot> needConfirmationUntiDeletion = new ArrayList<Plot>();
+	//List of players trying to buy a new island. They must use the command a second time to confirm the purchase.
+	//Periodically cleared
+	public List<String> needConfirmationUntiPurchase = new ArrayList<String>();
 
 	/**
 	 * Empty constructor for externalization
@@ -46,15 +50,19 @@ public class PlotHandler implements Externalizable
 			public void run()
 			{
 				needConfirmationUntiDeletion.clear();
+				needConfirmationUntiPurchase.clear();
 				Stack<Plot> toRemove = new Stack<Plot>();
 				for(Plot p : plotGrid.values())
 				{
 					if(p.shouldRemove())
+					{
 						toRemove.push(p);
+						plugin.getEconomy().depositPlayer(p.getOwner(), PlotHandler.PLOT_PRICE);
+					}
 				}
 				for(Plot p : toRemove) removePlot(p);
 			}
-		},1200L, 1200L);
+		},240L, 3600L);
 	}
 
 	public PlotHandler(String world)
@@ -123,6 +131,11 @@ public class PlotHandler implements Externalizable
 	public Plot getPlot(int x, int z)
 	{
 		return plotGrid.get(x, z);
+	}
+
+	public String getWorld()
+	{
+		return world;
 	}
 
 	private List<Coordinate> getRingOfPlotPositions(int currentRing)

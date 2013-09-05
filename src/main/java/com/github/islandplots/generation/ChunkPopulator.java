@@ -4,14 +4,14 @@ import java.util.Random;
 
 import com.github.islandplots.IslandPlots;
 
-import net.minecraft.server.v1_5_R3.ChunkSection;
-import net.minecraft.server.v1_5_R3.WorldGenCaves;
-import net.minecraft.server.v1_5_R3.WorldGenDungeons;
+import net.minecraft.server.v1_6_R2.ChunkSection;
+import net.minecraft.server.v1_6_R2.WorldGenCaves;
+import net.minecraft.server.v1_6_R2.WorldGenDungeons;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_5_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_6_R2.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -38,7 +38,7 @@ public class ChunkPopulator
 
 	public void populate() throws InterruptedException
 	{
-		net.minecraft.server.v1_5_R3.World nmsWorld = ((CraftWorld) world).getHandle();
+		net.minecraft.server.v1_6_R2.World nmsWorld = ((CraftWorld) world).getHandle();
 
 		byte[] blocks = new byte[32768];
 		for(int i = 0; i < blocks.length; i++) blocks[i] = 1;
@@ -57,7 +57,7 @@ public class ChunkPopulator
 			}
 		}
 
-		net.minecraft.server.v1_5_R3.Chunk nmsChunk = new net.minecraft.server.v1_5_R3.Chunk(nmsWorld, chunk.getX(), chunk.getZ());
+		net.minecraft.server.v1_6_R2.Chunk nmsChunk = new net.minecraft.server.v1_6_R2.Chunk(nmsWorld, chunk.getX(), chunk.getZ());
 		ChunkSection[] csect = nmsChunk.i();
 		for (int sec = 0; sec < chunkBlocks.length; sec++)
 		{

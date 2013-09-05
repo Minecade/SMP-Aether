@@ -38,6 +38,8 @@ public class BlockListener implements Listener
 	public void registerBlockChange(BlockBreakEvent event)
 	{
 		Block block = event.getBlock();
+		if(block.getWorld().getName().equals(plugin.getPlotHandler().getWorld()))
+			return;
 		if(block.getType().name().contains("ORE") && event.getPlayer().getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH))
 			return;
 		registerBlockChange(block.getLocation(), block.getType(), false);

@@ -18,10 +18,12 @@ import com.github.islandplots.utils.Utils;
 import com.github.islandplots.generation.GenerationQueue;
 import com.github.islandplots.generation.NullChunkGenerator;
 
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.OverCaste.plugin.RedProtect.RedProtect;
@@ -37,10 +39,7 @@ public class IslandPlots extends JavaPlugin
 	private PlotHandler plotHandler;
 	private GenerationQueue generationQueue;
 
-	private IslandPlotCommands ipCommands;
-	//Listeners
-	private PlayerListener pListener;
-	private BlockListener bListener;
+	private Economy economy;
 
 	@Override
 	public void onEnable()
@@ -50,17 +49,20 @@ public class IslandPlots extends JavaPlugin
 		loadConfiguration();
 		loadDefaults();
 
-		ipCommands = new IslandPlotCommands();
-		getCommand("island").setExecutor(ipCommands);
+		getCommand("island").setExecutor(new IslandPlotCommands());
 
 		PluginManager pm = Bukkit.getPluginManager();
 		multiverse = (MultiverseCore) pm.getPlugin("MultiverseCore");
 		redProtect = (RedProtect) pm.getPlugin("redProtect");
 		//Register listeners
-		pListener = new PlayerListener();
-		bListener = new BlockListener();
-		pListener.registerEvents(pm, this);
-		bListener.registerEvents(pm, this);
+		new PlayerListener().registerEvents(pm, this);
+		new BlockListener().registerEvents(pm, this);
+
+		if(!setupEconomy())
+		{
+			log(Level.SEVERE, "No economy plugin found to hook into. Plugin shutting down.");
+			Bukkit.getPluginManager().disablePlugin(this);
+		}
 
 		loadPlayerWrappers();
 		loadPlotHandler();
@@ -75,6 +77,11 @@ public class IslandPlots extends JavaPlugin
 
 		savePlayerWrappers(true);
 		savePlotHandler(true);
+	}
+
+	public Economy getEconomy()
+	{
+		return economy;
 	}
 
 	public MultiverseCore getMultiverse()
@@ -158,10 +165,10 @@ public class IslandPlots extends JavaPlugin
 	void savePlayerWrappers(boolean backup)
 	{
 		File path = new File(Constants.PLAYERS_PATH);
-		File[] backups = new File[5];
+		File[] backups = new File[2];
 		backups[0] = path;
 
-		for(int i = 1; i < 3; i++)
+		for(int i = 1; i < 2; i++)
 		{
 			backups[i] = new File(Constants.PLUGIN_PATH+File.separator+"playersbackup"+ i +".ext");
 		}
@@ -173,7 +180,7 @@ public class IslandPlots extends JavaPlugin
 				//If the two files are equal, there's no need for a backup
 				if(!Utils.fileEquals(backups[0], backups[1]))
 				{
-					for(int i = 2; i > 0; i--)
+					for(int i = 1; i > 0; i--)
 					{
 						if(backups[i - 1].exists())
 							Files.move(backups[i - 1], backups[i]);
@@ -202,10 +209,10 @@ public class IslandPlots extends JavaPlugin
 		if(plotHandler == null)
 			return;
 		File path = new File(Constants.PLOT_PATH);
-		File[] backups = new File[5];
+		File[] backups = new File[2];
 		backups[0] = path;
 
-		for(int i = 1; i < 3; i++)
+		for(int i = 1; i < 2; i++)
 		{
 			backups[i] = new File(Constants.PLUGIN_PATH+File.separator+"islandsbackup"+ i +".ext");
 		}
@@ -217,7 +224,7 @@ public class IslandPlots extends JavaPlugin
 				//If the two files are equal, there's no need for a backup
 				if(!Utils.fileEquals(backups[0], backups[1]))
 				{
-					for(int i = 2; i > 0; i--)
+					for(int i = 1; i > 0; i--)
 					{
 						if(backups[i - 1].exists())
 							Files.move(backups[i - 1], backups[i]);
@@ -248,6 +255,14 @@ public class IslandPlots extends JavaPlugin
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
 	{
 		return new NullChunkGenerator();
+	}
+
+	private boolean setupEconomy()
+	{
+		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+		if (economyProvider != null)
+			economy = economyProvider.getProvider();
+		return (economy != null);
 	}
 
 	public static void log(Level level, String log)
